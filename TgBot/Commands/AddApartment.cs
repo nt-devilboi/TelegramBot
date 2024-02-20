@@ -22,7 +22,7 @@ public class AddApartment : ICommand
     }
     
     public string Name { get; } = "/addApart";
-    public string desc { get; } = "/addApart {UrlApart}  add Apart to Receiving info about one";
+    public string desc { get; } = "addApart {UrlApart} add Apart to Receiving info about one";
 
     public async Task Execute(IRequest? request, ITelegramBotClient bot)
     {

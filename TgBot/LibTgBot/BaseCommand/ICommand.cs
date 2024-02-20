@@ -1,9 +1,8 @@
 using Telegram.Bot;
-using Message = Telegram.Bot.Types.Message;
 
 namespace TgBot.controller.BotController.Services;
 
-public interface ICommand
+public interface ICommand //todo: прописать абстарктынй класс, который будет по названию класса менять свойства "Name" 
 {
     public string Name { get; }
     

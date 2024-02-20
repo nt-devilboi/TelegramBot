@@ -18,8 +18,8 @@ public class AddEmail : ICommand
     }
 
     
-    public string Name { get; } = "/addEmail";
-    public string desc { get; } = "command for add email in dataBase";
+    public string Name { get; } = "/addMail";
+    public string desc { get; } = "addMail {mail}";
     
     
     public async Task Execute(IRequest? request, ITelegramBotClient bot) //addEmail and AddApart are obviously the same
@@ -36,7 +36,7 @@ public class AddEmail : ICommand
         }
         
         await _mailRepository.Add(user);
-        await bot.SendTextMessageAsync(chatId, "added email");
+        await bot.SendTextMessageAsync(chatId, "added email {");
         _log.Info($"addEmail: {mailAddress} in chatId: {chatId}");
     }
 }

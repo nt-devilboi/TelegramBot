@@ -10,14 +10,14 @@ using ICommand = TgBot.controller.BotController.Services.ICommand;
 
 namespace TgBot.Commands;
 
-public class SyncEmails : ICommand
+public class SyncMails : ICommand
 {
     private readonly IMailRepository _mails;
     private readonly IMediator _mediator;
     private readonly IApartmentRepo _aparts;
     private readonly ILog _log;
 
-    public SyncEmails(IMailRepository mails, ILog log, IMediator mediator, IApartmentRepo aparts)
+    public SyncMails(IMailRepository mails, ILog log, IMediator mediator, IApartmentRepo aparts)
     {
         _mails = mails;
         _log = log;
@@ -25,7 +25,7 @@ public class SyncEmails : ICommand
         _aparts = aparts;
     }
 
-    public string Name { get; } = "/syncEmail";
+    public string Name { get; } = "/syncMails";
     public string desc { get; } = "if you want to get info about apart to email use this command";
 
     public async Task Execute(IRequest? request, ITelegramBotClient bot)
@@ -33,13 +33,13 @@ public class SyncEmails : ICommand
         var chatId = request.Message.Chat.Id;
         var mails = await _mails.GetAllMailByChatId(chatId);
 
-        MailAddress from = new MailAddress("clashofnaks@gmail.com", "nikita");
-
-        SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+        var from = new MailAddress("clashofnaks@gmail.com", "nikita");
+        var smtp = new SmtpClient("smtp.gmail.com", 587)
         {
             Credentials = new NetworkCredential("clashofnaks@gmail.com", "chsk rupp emre epcn"),
             EnableSsl = true
         };
+        
         var apart = await _aparts.GetAll(chatId);
         var result= await _mediator.Send(new GetInfoApart(apart));
         if (result.IsEmpty)
@@ -64,6 +64,6 @@ public class SyncEmails : ICommand
         }
 
         await bot.SendTextMessageAsync(chatId, "message send to all Email");
-        _log.Info($"sent to all mail");
+        _log.Info($"sent to all mails");
     }
 }
