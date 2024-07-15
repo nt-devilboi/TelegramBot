@@ -1,5 +1,4 @@
 using Telegram.Bot.Types;
-using TgBot.controller.model;
 using TgBot.Domain.Entity;
 
 namespace MyBotTg.Bot;

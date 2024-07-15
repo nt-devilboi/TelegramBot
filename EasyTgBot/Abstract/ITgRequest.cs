@@ -1,13 +1,12 @@
 using Telegram.Bot.Types;
 
-namespace TgBot;
+namespace EasyTgBot.Abstract;
 
-public interface IRequest
+public interface ITgRequest
 {
     public string CommandName { get; set; }
     public string ExtraData { get; set; }
-    
+
     public Message Message { get; set; }
 
-    public bool IsCommand();
 }

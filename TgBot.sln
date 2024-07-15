@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TgBot", "TgBot\TgBot.csproj", "{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyTgBot", "EasyTgBot\EasyTgBot.csproj", "{F8617A5B-4E56-4F1E-B317-181D3833FA5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyOAuth2.0", "..\..\RiderProjects\EasyOAuth2.0\EasyOAuth2.0\EasyOAuth2.0.csproj", "{8E3B4031-01BA-4631-AC27-2423ADFF96E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8617A5B-4E56-4F1E-B317-181D3833FA5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8617A5B-4E56-4F1E-B317-181D3833FA5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8617A5B-4E56-4F1E-B317-181D3833FA5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8617A5B-4E56-4F1E-B317-181D3833FA5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

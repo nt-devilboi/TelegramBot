@@ -3,13 +3,13 @@ using TgBot.Domain.Entity;
 
 namespace TgBot.Infrastucture.DataBase;
 
-public class DbObjective : DbContext
+public class DbOAuth : DbContext
 {
-    public DbSet<Apartment> Apartments { get; set; }
-    public DbSet<Mail> Mails { get; set; }
+    public DbSet<LinkOAuth> LinkOAuths { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseMySql("server=127.0.0.1;user=root;password=123123;database=ObjectiveTest", new MySqlServerVersion(new Version(8, 0,0)));
+        optionsBuilder.UseInMemoryDatabase("FakeDbContext");
     }
 }

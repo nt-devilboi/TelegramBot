@@ -1,4 +1,4 @@
-namespace TgBot.controller.model;
+namespace EasyTgBot.BaseCommand;
 
 public class InfoCommand
 {
