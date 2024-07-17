@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace EasyTgBot;
 
-public class TgTgRequest : ITgRequest
+public class TgRequest : ITgRequest
 {
     public string CommandName { get; set; }
     public string ExtraData { get; set; }

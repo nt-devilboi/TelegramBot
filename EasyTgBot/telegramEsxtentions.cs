@@ -14,7 +14,7 @@ public static class TelegramExtensions
         var name = command[0];
         var extraData = command.Length == 2 ? command[1] : null;      
         
-        return new TgTgRequest()
+        return new TgRequest()
         {
             CommandName = name,
             ExtraData = extraData,
