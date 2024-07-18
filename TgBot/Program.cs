@@ -54,7 +54,7 @@ builder.Services.AddTransient<OAuthDb>();
 //todo: было бы прикольна сделать это всё в одно FluetApi.
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController("https://1763-188-234-192-63.ngrok-free.app",
-    "6184368668:AAHhdVpR7WvBzM6qFaR1EnWpLBIw4v72tq0");
+    Environment.GetEnvironmentVariable("TG_TOKEN") ?? throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 
 var app = builder.Build();
 app.UseTgCommands();
