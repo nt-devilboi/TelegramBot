@@ -17,7 +17,8 @@
       "applicationUrl": "http://localhost:5128",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "TG_TOKEN": "6184368668:AAHhdVpR7WvBzM6qFaR1EnWpLBIw4v72tq0"
+        "TG_TOKEN":  "6184368668:AAHhdVpR7WvBzM6qFaR1EnWpLBIw4v72tq0",
+        "CLIENT_ID": "294027402115-glp7fra8naehdnacs0asu5n4m5vurngu.apps.googleusercontent.com"
       }
       
     },
