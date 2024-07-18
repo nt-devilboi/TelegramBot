@@ -1,4 +1,5 @@
 using EasyOAuth;
+using EasyOAuth.Abstraction;
 
 namespace TgBot.Domain.Entity;
 

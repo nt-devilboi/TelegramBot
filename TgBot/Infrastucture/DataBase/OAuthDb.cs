@@ -3,7 +3,7 @@ using TgBot.Domain.Entity;
 
 namespace TgBot.Infrastucture.DataBase;
 
-public class DbOAuth : DbContext
+public class OAuthDb : DbContext
 {
     public DbSet<LinkOAuth> LinkOAuths { get; set; }
 

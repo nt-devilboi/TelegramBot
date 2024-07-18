@@ -6,7 +6,7 @@ using Vostok.Logging.Abstractions;
 
 namespace TgBot.Infrastucture;
 
-public class StrategyToken : IStrategyToken
+public class StrategyToken : EasyOAuth.Abstraction.StrategyToken
 {
     private readonly ILog _log;
     private ITelegramBotClient _bot;

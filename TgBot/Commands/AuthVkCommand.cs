@@ -6,7 +6,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Vostok.Logging.Abstractions;
 
-namespace TgBot.Commands.VkCommands;
+namespace TgBot.Commands;
 
 [Description("Auth By vk")]
 public class AuthVkCommand : CommandTgBase

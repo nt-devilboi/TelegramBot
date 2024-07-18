@@ -8,11 +8,11 @@ namespace TgBot.Infrastucture.Repositories;
 
 public class LinkOauthRepos : TokenLinkRepositoryBase
 {
-    private readonly DbOAuth DbContext;
+    private readonly OAuthDb _oAuthDbContext;
 
-    public LinkOauthRepos(DbOAuth dbContext)
+    public LinkOauthRepos(OAuthDb oAuthDbContext)
     {
-        DbContext = dbContext;
+        _oAuthDbContext = oAuthDbContext;
     }
 
 
@@ -26,8 +26,8 @@ public class LinkOauthRepos : TokenLinkRepositoryBase
         };
         
         
-        DbContext.LinkOAuths.Add(linkOauth);
-        await DbContext.SaveChangesAsync();
+        _oAuthDbContext.LinkOAuths.Add(linkOauth);
+        await _oAuthDbContext.SaveChangesAsync();
     }
 
     public override Task<OAuthEntity> GetByExtraData(string extraData)
@@ -37,7 +37,7 @@ public class LinkOauthRepos : TokenLinkRepositoryBase
 
     public override async Task<OAuthEntity> GetByState(string state)
     {
-        return await DbContext.LinkOAuths.FirstOrDefaultAsync(e => e.State == state);
+        return await _oAuthDbContext.LinkOAuths.FirstOrDefaultAsync(e => e.State == state);
     }
     
 }

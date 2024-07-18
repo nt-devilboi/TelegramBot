@@ -1,7 +1,6 @@
 using System.Reflection;
 using EasyOAuth;
 using EasyOAuth.Builder;
-using EasyOAuth.Constructor;
 using EasyOAuth.Extensions;
 using EasyTgBot;
 using TgBot;
@@ -50,7 +49,7 @@ builder.Services.AddMediatR(cnf =>
     cnf.Lifetime = ServiceLifetime.Singleton;
 });
 
-builder.Services.AddTransient<DbOAuth>();
+builder.Services.AddTransient<OAuthDb>();
 
 //todo: было бы прикольна сделать это всё в одно FluetApi.
 builder.Services.AddTelegramCommands();
