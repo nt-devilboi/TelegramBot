@@ -2,7 +2,8 @@ namespace EasyTgBot.Result;
 
 public class Result<T>
 {
-    private bool _successed;
+    private readonly bool _successed;
+
     public Result(T value)
     {
         Value = value;
@@ -13,9 +14,17 @@ public class Result<T>
     {
         Error = error;
     }
-    
-    public bool Succeed() => _successed;
+
     public string Error { get; }
     public T Value { get; }
-    public static implicit operator Result<T>(T value) => new(value);
+
+    public bool Succeed()
+    {
+        return _successed;
+    }
+
+    public static implicit operator Result<T>(T value)
+    {
+        return new Result<T>(value);
+    }
 }

@@ -1,4 +1,6 @@
 using EasyTgBot.Abstract;
+using EasyTgBot.Entity;
+using EasyTgBot.Restored.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -7,9 +9,13 @@ namespace EasyTgBot.controller;
 
 [ApiController]
 [Route("/api/message/update")]
-public class BotController(ITelegramBotClient telegramBotClient, ICommandCollection serviceCommandCollection)
+public class BotController(
+    ITelegramBotClient telegramBotClient,
+    ICommandCollection serviceCommandCollection,
+    IChatRepository chatRepository,
+    IContextProcess contextProcess)
 {
-    [HttpPost]
+    [HttpPost] //todo есть что рефакторить
     public async Task<IActionResult> Post([FromBody] Update? update)
     {
         if (update?.Message?.Text == null) return new OkResult();
@@ -21,16 +27,38 @@ public class BotController(ITelegramBotClient telegramBotClient, ICommandCollect
             return new OkResult();
         }
 
-        var request = result.Value; 
-        if (!serviceCommandCollection.Contains(request.CommandName))
+        var request = result.Value;
+
+        var context = await chatRepository.GetContext(request.Message.Chat.Id.ToString());
+
+        if (!serviceCommandCollection.Contains(request.messageFromUser))
         {
-            await telegramBotClient.SendTextMessageAsync(request.Message.Chat.Id, "I don't known this command");;
+            await contextProcess.Handle(request, telegramBotClient, context ?? NotAuthorized());
             return new OkResult();
         }
 
-        var command = serviceCommandCollection.Get(request.CommandName);
-        await command.Execute(request, telegramBotClient);
+        var command = serviceCommandCollection.Get(request.messageFromUser);
+
+        try
+        {
+            await command.Execute(request, telegramBotClient, context ?? NotAuthorized());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e); //todo поставить логер.
+            await telegramBotClient.SendTextMessageAsync(request.Message.Chat.Id, "Твоя команда меня сломала");
+        }
 
         return new OkResult();
+    }
+
+    private ChatContext NotAuthorized()
+    {
+        return new ChatContext
+        {
+            State = (int)ContextState.NotAuthenticated,
+            Id = Guid.NewGuid(),
+            Payload = ""
+        };
     }
 }

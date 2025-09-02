@@ -1,35 +1,29 @@
 using EasyTgBot.Abstract;
 using EasyTgBot.BaseCommand;
+using EasyTgBot.Restored.Abstract;
 
 namespace EasyTgBot.ServiceCommand;
 
 public class CommandCollection : ICommandCollection
 {
-    private readonly Dictionary<string, ICommandTg> _commands;
+    private readonly Dictionary<string, ICommand> _commands;
     private readonly List<InfoCommand> _infoCommands; //todo: вот бы это не хранить как отдельный класс)))
 
     public CommandCollection()
     {
         _infoCommands = new List<InfoCommand>();
-        _commands = new Dictionary<string, ICommandTg>();
+        _commands = new Dictionary<string, ICommand>();
 
-        Add(new HelpCommand(_infoCommands));
+        Add(new Help(_infoCommands));
     }
 
-    public void Add(ICommandTg commandTg)
+    public void Add(ICommand command)
     {
-        if (_commands.ContainsKey(commandTg.Name))
-        {
-            throw new ApplicationException($"command {commandTg.Name} existed yet");
-        }
-        
-        if (commandTg.Name[0] != '/')
-        {
-            throw new AggregateException("command not start with '/'");
-        }
-        
-        _commands.Add(commandTg.Name, commandTg);
-        var info = new InfoCommand() { Info = $"{commandTg.Name} - {commandTg.Desc}" }; // выглядит как кринж.
+        if (!_commands.TryAdd(command.Name, command))
+            throw new ApplicationException($"command {command.Name} existed yet");
+
+
+        var info = new InfoCommand { Info = $"{command.Name} - {command.Desc}" };
         _infoCommands.Add(info);
     }
 
@@ -38,12 +32,9 @@ public class CommandCollection : ICommandCollection
         return _commands.ContainsKey(commandName);
     }
 
-    public ICommandTg Get(string commandName)
+    public ICommand Get(string commandName)
     {
-        if (!_commands.ContainsKey(commandName))
-        {
-            throw new ArgumentException($"this Command not Existed {commandName}");
-        }
+        if (!_commands.ContainsKey(commandName)) throw new ArgumentException($"this Command not Exists {commandName}");
 
         return _commands[commandName];
     }

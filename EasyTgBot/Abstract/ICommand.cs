@@ -1,12 +1,12 @@
+using EasyTgBot.Entity;
 using Telegram.Bot;
 
-namespace EasyTgBot.Abstract;
+namespace EasyTgBot.Restored.Abstract;
 
-public interface
-    ICommandTg //todo: прописать абстарктынй класс, который будет по названию класса менять свойства "Name" 
+public interface ICommand
 {
     public string Name { get; }
 
     public string Desc { get; }
-    public Task Execute(ITgRequest? request, ITelegramBotClient bot);
+    public Task Execute(ITgRequest? request, ITelegramBotClient bot, ChatContext context = null);
 }

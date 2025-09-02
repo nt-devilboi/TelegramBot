@@ -1,11 +1,13 @@
-using System.Data;
 using System.Reflection;
 using EasyOAuth;
 using EasyOAuth.Builder;
 using EasyOAuth.Extensions;
 using EasyTgBot;
+using EasyTgBot.Abstract;
+using EasyTgBot.Restored.Abstract;
 using TgBot;
 using TgBot.Domain.Entity;
+using TgBot.HandlerContext;
 using TgBot.Infrastucture;
 using TgBot.Infrastucture.DataBase;
 using TgBot.Infrastucture.Repositories;
@@ -16,19 +18,19 @@ using Vostok.Logging.Microsoft;
 var builder = WebApplication.CreateBuilder(args);
 var oAuths = OAuths.CreateBuilder();
 oAuths.AddOAuth("google", _ =>
-    _.SetUriPageAuth("https://accounts.google.com/o/oauth2/v2/auth")
-        .SetUriGetAccessToken("https://oauth2.googleapis.com/token")
-        .SetResponseType("code")
-        .ConfigureApp()
-        .SetClientId(Environment.GetEnvironmentVariable("CLIENT_ID") ?? string.Empty)
-        .SetClientSecret(Environment.GetEnvironmentVariable("CLIENT_SECRET") ?? string.Empty)
-        .SetScope("email")
-        .SetRedirectUrl("http://localhost:5128/api/oauth")
-        .SetCustomQuery("grant_type", "authorization_code", QueryFor.GetAccessToken))
-;
+        _.SetUriPageAuth("https://accounts.google.com/o/oauth2/v2/auth")
+            .SetUriGetAccessToken("https://oauth2.googleapis.com/token")
+            .SetResponseType("code")
+            .ConfigureApp()
+            .SetClientId(Environment.GetEnvironmentVariable("CLIENT_ID") ?? string.Empty)
+            .SetClientSecret(Environment.GetEnvironmentVariable("CLIENT_SECRET") ?? string.Empty)
+            .SetScope("email")
+            .SetRedirectUrl("http://localhost:5128/api/oauth")
+            .SetCustomQuery("grant_type", "authorization_code", QueryFor.GetAccessToken))
+    ;
 
 
-var log = new ConsoleLog(new ConsoleLogSettings()
+var log = new ConsoleLog(new ConsoleLogSettings
 {
     ColorsEnabled = true
 });
@@ -42,7 +44,9 @@ builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddOAuths<LinkOAuth,LinkOauthRepos, StrategyToken>(oAuths);
+
+builder.Services.AddOAuths<TelegramOAuth, LinkOauthRepository, StrategyToken>(oAuths);
+
 
 builder.Services.AddMediatR(cnf =>
 {
@@ -50,29 +54,31 @@ builder.Services.AddMediatR(cnf =>
     cnf.Lifetime = ServiceLifetime.Singleton;
 });
 
-builder.Services.AddTransient<OAuthDb>();
+builder.Services.AddTransient<ChatDb>();
 
-//todo: было бы прикольна сделать это всё в одно FluetApi.
 builder.Services.AddTelegramCommands();
-builder.Services.AddTelegramBotWithController("https://1763-188-234-192-63.ngrok-free.app",
-    Environment.GetEnvironmentVariable("TG_TOKEN") ?? throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
+builder.Services.AddTelegramBotWithController("https://0dabfa03893e1a.lhr.life",
+    Environment.GetEnvironmentVariable("TG_TOKEN", EnvironmentVariableTarget.User) ??
+    throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
+builder.Services.AddScoped<IChatContextRepository, ChatContextRepository>();
+builder.Services.AddScoped<IContextProcess, AddRecipeFlow>();
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseTgCommands();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/error");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 
 
 app.MapControllers();
-/*app.UseWhen(x => x.Request.Path.StartsWithSegments("/api"), c =>
-{
-c.UseMiddleware<IsTelegramChatMiddleWare>();
-});*/
+
 app.Run();
