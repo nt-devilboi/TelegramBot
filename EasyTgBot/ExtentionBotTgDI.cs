@@ -16,7 +16,7 @@ public static class ExtensionBotTgDI
         string token)
     {
         serviceCollection.AddMvc().AddApplicationPart(Assembly.GetAssembly(typeof(BotController)));
-        var client = new TelegramBotClient(token); // todo: Put  up in  EviromentVar
+        var client = new TelegramBotClient(token);
         var webhook = $"{host}/api/message/update";
         client.SetWebhookAsync(webhook).Wait();
         serviceCollection.AddSingleton<ITelegramBotClient>(client);
