@@ -1,3 +1,4 @@
 *.idea
 *bin
 /TgBot/Env/dev/data
+*obj

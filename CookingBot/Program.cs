@@ -60,7 +60,7 @@ builder.Services.AddMediatR(cnf =>
 builder.Services.AddTransient<ChatDb>();
 
 builder.Services.AddTelegramCommands();
-builder.Services.AddTelegramBotWithController("https://c74b1457247c85.lhr.life",
+builder.Services.AddTelegramBotWithController("https://503f13e31f3212.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN", EnvironmentVariableTarget.User) ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
