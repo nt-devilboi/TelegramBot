@@ -4,13 +4,16 @@ using EasyOAuth.Builder;
 using EasyOAuth.Extensions;
 using EasyTgBot;
 using EasyTgBot.Abstract;
-using EasyTgBot.Restored.Abstract;
-using TgBot;
-using TgBot.Domain.Entity;
-using TgBot.HandlerContext;
-using TgBot.Infrastucture;
-using TgBot.Infrastucture.DataBase;
-using TgBot.Infrastucture.Repositories;
+using CookingBot;
+using CookingBot.Application.Commands.AddRecipe.Flow;
+using CookingBot.Application.Interfaces;
+using CookingBot.Commands.AddRecipe.Flow;
+using CookingBot.Domain.Entity;
+using CookingBot.Infrastructure;
+using CookingBot.Infrastructure.Repositories;
+using CookingBot.Infrastucture;
+using CookingBot.Infrastucture.DataBase;
+using CookingBot.Infrastucture.Repositories;
 using Vostok.Logging.Abstractions;
 using Vostok.Logging.Console;
 using Vostok.Logging.Microsoft;
@@ -57,11 +60,11 @@ builder.Services.AddMediatR(cnf =>
 builder.Services.AddTransient<ChatDb>();
 
 builder.Services.AddTelegramCommands();
-builder.Services.AddTelegramBotWithController("https://0dabfa03893e1a.lhr.life",
+builder.Services.AddTelegramBotWithController("https://c74b1457247c85.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN", EnvironmentVariableTarget.User) ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
-
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IChatContextRepository, ChatContextRepository>();
 builder.Services.AddScoped<IContextProcess, AddRecipeFlow>();
 var app = builder.Build();

@@ -2,7 +2,7 @@ using System.Text.Json;
 using Google;
 using Vostok.Logging.Abstractions;
 
-namespace TgBot;
+namespace CookingBot;
 
 public class ExceptionHandlingMiddleware
 {

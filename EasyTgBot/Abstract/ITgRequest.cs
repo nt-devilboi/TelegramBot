@@ -1,11 +1,15 @@
 using Telegram.Bot.Types;
 
-namespace EasyTgBot.Restored.Abstract;
+namespace EasyTgBot.Abstract;
 
-public interface ITgRequest
+public interface ITgRequest<TData>
 {
-    public string messageFromUser { get; set; }
-    public string ExtraData { get; set; }
+    TData Value { get; }
+    Update Update { get; }
+}
 
-    public Message Message { get; set; }
+public class TextRequest : ITgRequest<string>
+{
+    public string Value { get; init; }
+    public Update Update { get; init; }
 }

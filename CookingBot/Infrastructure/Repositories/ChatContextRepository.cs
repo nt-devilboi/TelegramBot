@@ -1,9 +1,9 @@
+using CookingBot.Infrastucture.DataBase;
+using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
-using EasyTgBot.Restored.Abstract;
-using TgBot.Domain.Entity;
-using TgBot.Infrastucture.DataBase;
+using Microsoft.EntityFrameworkCore;
 
-namespace TgBot.Infrastucture.Repositories;
+namespace CookingBot.Infrastructure.Repositories;
 
 public class ChatContextRepository(ChatDb dbContext) : IChatContextRepository
 {
@@ -15,5 +15,12 @@ public class ChatContextRepository(ChatDb dbContext) : IChatContextRepository
         else dbContext.Entry(context).CurrentValues.SetValues(chatContext);
 
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<ChatContext?> Get(long chatId)
+    {
+        var chatContext = await dbContext.ChatContexts.FirstOrDefaultAsync(x => x.ChatId == chatId);
+
+        return chatContext;
     }
 }

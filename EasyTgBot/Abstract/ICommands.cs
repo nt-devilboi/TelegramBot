@@ -1,5 +1,3 @@
-using EasyTgBot.Restored.Abstract;
-
 namespace EasyTgBot.Abstract;
 
 public interface ICommandCollection

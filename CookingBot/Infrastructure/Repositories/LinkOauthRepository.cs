@@ -1,9 +1,9 @@
+using CookingBot.Domain.Entity;
+using CookingBot.Infrastucture.DataBase;
 using EasyOAuth.Abstraction;
 using Microsoft.EntityFrameworkCore;
-using TgBot.Domain.Entity;
-using TgBot.Infrastucture.DataBase;
 
-namespace TgBot.Infrastucture.Repositories;
+namespace CookingBot.Infrastucture.Repositories;
 
 public class LinkOauthRepository(ChatDb chatDbContext) : TokenLinkRepositoryBase
 {
@@ -11,7 +11,7 @@ public class LinkOauthRepository(ChatDb chatDbContext) : TokenLinkRepositoryBase
     {
         var linkOauth = new TelegramOAuth
         {
-            chatId = id,
+            chatId = long.Parse(id),
             State = state,
             OAuthName = Oauth
         };

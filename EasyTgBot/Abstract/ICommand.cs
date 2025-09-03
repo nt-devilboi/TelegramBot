@@ -1,12 +1,13 @@
 using EasyTgBot.Entity;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
-namespace EasyTgBot.Restored.Abstract;
+namespace EasyTgBot.Abstract;
 
 public interface ICommand
 {
     public string Name { get; }
 
     public string Desc { get; }
-    public Task Execute(ITgRequest? request, ITelegramBotClient bot, ChatContext context = null);
+    public Task Execute(Update update, ITelegramBotClient bot, ChatContext context = null);
 }

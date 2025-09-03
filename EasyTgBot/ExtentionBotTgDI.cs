@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Reflection;
 using EasyTgBot.Abstract;
 using EasyTgBot.controller;
-using EasyTgBot.Restored.Abstract;
 using EasyTgBot.ServiceCommand;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

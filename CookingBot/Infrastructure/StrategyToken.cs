@@ -1,12 +1,11 @@
+using CookingBot.Domain.Entity;
 using EasyOAuth.Abstraction;
+using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
-using EasyTgBot.Restored.Abstract;
 using Telegram.Bot;
-using TgBot.Domain.Entity;
-using TgBot.Infrastucture.DataBase;
 using Vostok.Logging.Abstractions;
 
-namespace TgBot.Infrastucture;
+namespace CookingBot.Infrastructure;
 
 public class StrategyToken : EasyOAuth.Abstraction.StrategyToken
 {
@@ -26,26 +25,25 @@ public class StrategyToken : EasyOAuth.Abstraction.StrategyToken
 
     public override async Task Execute(string token, OAuthEntity data)
     {
-        var dataTotal = data as TelegramOAuth;
+        var telegramOAuth = data as TelegramOAuth;
         var chatContext = new ChatContext
         {
             State = (int)ContextState.Menu,
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            ChatId = telegramOAuth.chatId
         };
         var chat = new Chat
         {
             token = token,
-            ChatId = dataTotal.chatId,
-            Id = Guid.NewGuid(),
-            ChatContext = chatContext
+            Id = telegramOAuth.chatId,
         };
 
         await _chatRepository.Add(chat);
+        await _chatContextRepository.Upsert(chatContext);
+
+        _log.Info($"{telegramOAuth.chatId}");
 
 
-        _log.Info($"{dataTotal.chatId}");
-
-
-        await _bot.SendTextMessageAsync(long.Parse(dataTotal.chatId), "authosiziation is succesful");
+        await _bot.SendTextMessageAsync(telegramOAuth.chatId, "authosiziation is succesful");
     }
 }

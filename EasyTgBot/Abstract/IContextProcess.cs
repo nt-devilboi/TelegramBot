@@ -1,10 +1,10 @@
 using EasyTgBot.Entity;
-using EasyTgBot.Restored.Abstract;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace EasyTgBot.Abstract;
 
 public interface IContextProcess
 {
-    Task Handle(ITgRequest request, ITelegramBotClient telegramBotClient, ChatContext context);
+    Task Handle(Update update,ITelegramBotClient telegramBotClient, ChatContext context);
 }

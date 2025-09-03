@@ -1,8 +1,8 @@
 using EasyOAuth.Abstraction;
 
-namespace TgBot.Domain.Entity;
+namespace CookingBot.Domain.Entity;
 
 public class TelegramOAuth : OAuthEntity
 {
-    public string chatId { get; set; }
+    public long chatId { get; init; }
 }

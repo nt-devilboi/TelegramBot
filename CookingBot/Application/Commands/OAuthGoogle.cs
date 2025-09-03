@@ -1,19 +1,21 @@
 using EasyOAuth.Abstraction;
+using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
-using EasyTgBot.Restored.Abstract;
 using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using TgBot.Domain.Entity;
+using Telegram.Bots.Types;
 using Vostok.Logging.Abstractions;
+using InlineKeyboardMarkup = Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup;
+using ParseMode = Telegram.Bot.Types.Enums.ParseMode;
+using Update = Telegram.Bot.Types.Update;
 
-namespace TgBot.Commands;
+namespace CookingBot.Commands;
 
 public class OAuthGoogle : ICommand
 {
     private readonly IOAuthClient _authClient;
     private readonly ILog _log;
-    private readonly string _text = "Vk";
+    private readonly string _text = "Google";
 
     public OAuthGoogle(IOAuthClient authClient, ILog log)
     {
@@ -24,9 +26,9 @@ public class OAuthGoogle : ICommand
     public string Name => "Авторизоваться через google";
     public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал, кто ты";
 
-    public async Task Execute(ITgRequest? request, ITelegramBotClient bot, ChatContext context)
+    public async Task Execute(Update update, ITelegramBotClient bot, ChatContext context = null)
     {
-        var chatId = request.Message.Chat.Id;
+        var chatId = update.Message.Chat.Id;
 
         if (context.State != (int)ContextState.NotAuthenticated)
         {

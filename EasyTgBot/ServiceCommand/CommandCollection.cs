@@ -1,6 +1,5 @@
 using EasyTgBot.Abstract;
 using EasyTgBot.BaseCommand;
-using EasyTgBot.Restored.Abstract;
 
 namespace EasyTgBot.ServiceCommand;
 
