@@ -1,6 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TgBot", "TgBot\TgBot.csproj", "{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookingBot", "CookingBot\CookingBot.csproj", "{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyOAuth2.0", "..\..\RiderProjects\EasyOAuth2.0\EasyOAuth2.0\EasyOAuth2.0.csproj", "{8E3B4031-01BA-4631-AC27-2423ADFF96E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyTgBot", "EasyTgBot\EasyTgBot.csproj", "{E7A84C47-14CD-4CB4-9FD3-CC7260139271}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookingBot.Tests", "CookingBot.Tests\CookingBot.Tests.csproj", "{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +18,17 @@ Global
 		{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FA4BA4F-A95C-400A-8F04-5D261B96A58B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

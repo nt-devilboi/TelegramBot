@@ -1,0 +1,36 @@
+using CookingBot.Domain.Entity;
+using CookingBot.Domain.Payloads;
+using EasyTgBot.Entity;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+
+namespace CookingBot.Infrastucture.DataBase;
+
+public class ChatDb : DbContext
+{
+    public DbSet<TelegramOAuth> LinkOAuths { get; set; }
+    public DbSet<Chat> Chat { get; set; }
+    public DbSet<ChatContext> ChatContexts { get; set; }
+    public DbSet<Recipe> Recipes { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseInMemoryDatabase("FakeDbContext");
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        //     
+        // modelBuilder.Entity<Recipe>()
+        //     .Property(x => x.Ingredients)
+        //     .HasColumnType("jsonb")
+        //     .HasConversion<string>();
+        modelBuilder.Entity<Recipe>()
+            .Property(x => x.Ingredients)
+            .HasColumnType("jsonb")
+            .HasConversion<string>(x => JsonConvert.SerializeObject(x), x => JsonConvert.DeserializeObject<Dictionary<string, IngredientDetail>>(x));
+
+        modelBuilder.Ignore<IngredientDetail>();
+        base.OnModelCreating(modelBuilder);
+    }
+}
