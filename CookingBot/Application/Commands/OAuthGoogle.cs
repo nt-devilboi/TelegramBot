@@ -1,4 +1,5 @@
 using EasyOAuth.Abstraction;
+using EasyTgBot;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Telegram.Bot;
@@ -23,19 +24,24 @@ public class OAuthGoogle : ICommand
         _log = log;
     }
 
-    public string Name => "Авторизоваться через google";
-    public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал, кто ты";
+    public string Trigger => "Авторизоваться через google";
+    public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал кто ты";
 
     public async Task Execute(Update update, ITelegramBotClient bot, ChatContext context = null)
     {
         var chatId = update.Message.Chat.Id;
 
-        if (context.State != (int)ContextState.NotAuthenticated)
+        if (context.InUserAccount())
         {
             await bot.SendTextMessageAsync(chatId, "Ты уже авторизован");
             return;
         }
 
+        if (context.InFlow())
+        {
+            await bot.SendTextMessageAsync(chatId, "Ты сейчас уже что-то делаешь");
+        }
+        
         _log.Info($"при созданий запроса chat id {chatId}");
         var bottons =
             new InlineKeyboardMarkup(InlineKeyboardButton.WithUrl(_text,

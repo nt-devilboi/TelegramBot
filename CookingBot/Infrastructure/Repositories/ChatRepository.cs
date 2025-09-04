@@ -1,4 +1,4 @@
-using CookingBot.Infrastucture.DataBase;
+using CookingBot.Infrastructure.DataBase;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Vostok.Logging.Abstractions;

@@ -1,5 +1,5 @@
 using CookingBot.Domain.Entity;
-using CookingBot.Infrastucture.DataBase;
+using CookingBot.Infrastructure.DataBase;
 using EasyOAuth.Abstraction;
 using Microsoft.EntityFrameworkCore;
 

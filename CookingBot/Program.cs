@@ -10,9 +10,9 @@ using CookingBot.Application.Interfaces;
 using CookingBot.Commands.AddRecipe.Flow;
 using CookingBot.Domain.Entity;
 using CookingBot.Infrastructure;
+using CookingBot.Infrastructure.DataBase;
 using CookingBot.Infrastructure.Repositories;
 using CookingBot.Infrastucture;
-using CookingBot.Infrastucture.DataBase;
 using CookingBot.Infrastucture.Repositories;
 using Vostok.Logging.Abstractions;
 using Vostok.Logging.Console;
@@ -51,16 +51,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOAuths<TelegramOAuth, LinkOauthRepository, StrategyToken>(oAuths);
 
 
-builder.Services.AddMediatR(cnf =>
-{
-    cnf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-    cnf.Lifetime = ServiceLifetime.Singleton;
-});
-
 builder.Services.AddTransient<ChatDb>();
 
 builder.Services.AddTelegramCommands();
-builder.Services.AddTelegramBotWithController("https://503f13e31f3212.lhr.life",
+builder.Services.AddTelegramBotWithController("https://ac1cecb97a3fd1.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN", EnvironmentVariableTarget.User) ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddScoped<IChatRepository, ChatRepository>();

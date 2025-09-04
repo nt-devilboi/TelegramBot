@@ -1,19 +1,16 @@
 using CookingBot.Commands.AddRecipe.Flow;
+using EasyTgBot;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using CookingBot.Domain.Entity;
 
-namespace CookingBot.Commands;
+namespace CookingBot.Application.Commands.AddRecipe;
 
-public class StartAddRecipe(
-    IChatRepository chatRepository,
-    IChatContextRepository chatContextRepository)
+public class StartAddRecipe(IChatContextRepository chatContextRepository)
     : ICommand
 {
-    private readonly IChatRepository _chatRepository = chatRepository;
-    public string Name { get; } = "Добавить рецепт";
+    public string Trigger { get; } = "Добавить рецепт";
     public string Desc { get; }
 
     public async Task Execute(Update request, ITelegramBotClient bot, ChatContext context)
@@ -26,12 +23,12 @@ public class StartAddRecipe(
             return;
         }
 
-        if (context.State == (int)ContextState.Menu)
+        if (context.InUserAccount())
         {
             context.State = (int)AddingRecipeStateContext.AddingName;
 
             await chatContextRepository.Upsert(context);
-            await bot.SendTextMessageAsync(chatId, $"{context.State}: {context.Payload}");
+            await bot.SendTextMessageAsync(chatId, $"Дай название рецепту");
         }
         else
         {

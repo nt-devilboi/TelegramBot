@@ -14,7 +14,7 @@ public class BotController(
     IChatContextRepository chatContextRepository,
     IContextProcess contextProcess)
 {
-    [HttpPost] //todo есть что рефакторить
+    [HttpPost]
     public async Task<IActionResult> Post([FromBody] Update? update)
     {
         if (update?.Message == null) return new OkResult();
@@ -48,7 +48,7 @@ public class BotController(
     {
         return new ChatContext
         {
-            State = (int)ContextState.NotAuthenticated,
+            State = (int)ContextState.Public,
             Id = Guid.NewGuid(),
             Payload = ""
         };

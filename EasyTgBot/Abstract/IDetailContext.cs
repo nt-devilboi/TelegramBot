@@ -1,3 +1,6 @@
+using System.Data.Common;
+using EasyTgBot.Entity;
+
 namespace EasyTgBot.Abstract;
 
 public interface IDetailContext<TPayload, out TState> where TState : Enum
@@ -9,4 +12,12 @@ public interface IDetailContext<TPayload, out TState> where TState : Enum
 
     public bool WasChanged { get; }
     public TState State { get; }
+
+
+    public static IDetailContext<TPayload, TState> ToIDetailContext<TPayload, TState>(ChatContext context) where TState : Enum
+    {
+        return 
+    }
+    
+    
 }

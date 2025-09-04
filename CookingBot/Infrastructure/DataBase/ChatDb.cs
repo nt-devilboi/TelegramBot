@@ -4,7 +4,7 @@ using EasyTgBot.Entity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
-namespace CookingBot.Infrastucture.DataBase;
+namespace CookingBot.Infrastructure.DataBase;
 
 public class ChatDb : DbContext
 {

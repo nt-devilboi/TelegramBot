@@ -9,13 +9,13 @@ namespace CookingBot.Application.Commands;
 
 public class CheckMyRecipe(IRecipeRepository recipeRepository) : ICommand
 {
-    public string Name { get; } = "Покажи мой рецепты";
+    public string Trigger { get; } = "Покажи мой рецепты";
     public string Desc { get; }
 
 
     public async Task Execute(Update update, ITelegramBotClient bot, ChatContext context)
     {
-        var recipes = recipeRepository.Get(update.Message.Chat.Id);
+        var recipes = await recipeRepository.Get(update.Message.Chat.Id);
 
         await bot.SendTextMessageAsync(update.Message.Chat.Id, GetRecipes(recipes));
     }
@@ -26,7 +26,8 @@ public class CheckMyRecipe(IRecipeRepository recipeRepository) : ICommand
         return string.Join("\n\n",
             recipes.Select(x =>
                 $"{x.nameRecipe}:\n" +
-                $"{GetIngredientsList(x)}"));
+                $"{GetIngredientsList(x)}" +
+                $"\n{x.Instruction}"));
     }
 
     private static string GetIngredientsList(Recipe x)

@@ -18,11 +18,11 @@ public class CommandCollection : ICommandCollection
 
     public void Add(ICommand command)
     {
-        if (!_commands.TryAdd(command.Name, command))
-            throw new ApplicationException($"command {command.Name} existed yet");
+        if (!_commands.TryAdd(command.Trigger, command))
+            throw new ApplicationException($"command {command.Trigger} existed yet");
 
 
-        var info = new InfoCommand { Info = $"{command.Name} - {command.Desc}" };
+        var info = new InfoCommand { Info = $"{command.Trigger} - {command.Desc}" };
         _infoCommands.Add(info);
     }
 

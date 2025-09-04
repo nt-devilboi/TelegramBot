@@ -4,7 +4,7 @@ using EasyTgBot.Entity;
 using Newtonsoft.Json;
 using JsonException = System.Text.Json.JsonException;
 
-namespace CookingBot.Commands.AddRecipe.Flow;
+namespace CookingBot.Application.Commands.AddRecipe.Flow;
 
 public class RecipeContext<TPayload, TState> : IDetailContext<TPayload, TState> where TState : Enum
 {
@@ -51,7 +51,7 @@ public class RecipeContext<TPayload, TState> : IDetailContext<TPayload, TState> 
         return this;
     }
 
-    //todo: как будто лучше выкинуть это в абстрактную фабрику.
+    //todo: как будто лучше выкинуть это в абстрактную фабрику. и тем самым одним extensions можно будет добавлять все элементы flow. Add(typeof(FlodName..
     public static IDetailContext<TPayload, TState> Create(ChatContext context)
     {
         if (string.IsNullOrEmpty(context.Payload))
@@ -71,50 +71,4 @@ public class RecipeContext<TPayload, TState> : IDetailContext<TPayload, TState> 
 
         return this;
     }
-}
-
-public class TransactionService : ITransactionService
-{
-    private readonly Dictionary<AddingRecipeStateContext, AddingRecipeStateContext> NextStepFrom = new()
-    {
-        {
-            AddingRecipeStateContext.AddingName, AddingRecipeStateContext.AddingIngredient
-        },
-        {
-            AddingRecipeStateContext.AddingIngredient, AddingRecipeStateContext.AddingInstruction
-        },
-        {
-            AddingRecipeStateContext.AddingInstruction, AddingRecipeStateContext.SaveRecipe
-        },
-        {
-            AddingRecipeStateContext.SaveRecipe, AddingRecipeStateContext.ReturnToMenu
-        }
-    };
-
-    private readonly Dictionary<AddingRecipeStateContext, AddingRecipeStateContext> CanMove = new()
-    {
-        {
-            AddingRecipeStateContext.AddingName, AddingRecipeStateContext.AddingIngredient
-        }
-    };
-
-    public void NextState(ChatContext context)
-    {
-        context.State = (int)NextStepFrom[(AddingRecipeStateContext)context.State];
-    }
-
-    public void NextState(ChatContext context, AddingRecipeStateContext addingRecipeStateContext)
-    {
-        if (CanMove[(AddingRecipeStateContext)context.State] == addingRecipeStateContext)
-            context.State = (int)NextStepFrom[(AddingRecipeStateContext)context.State];
-    }
-}
-
-public enum AddingRecipeStateContext
-{
-    ReturnToMenu = 1,
-    AddingName = 10000,
-    AddingIngredient,
-    AddingInstruction,
-    SaveRecipe
 }

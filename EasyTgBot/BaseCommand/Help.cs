@@ -7,7 +7,7 @@ namespace EasyTgBot.BaseCommand;
 
 public class Help(List<InfoCommand> infoCommands) : ICommand
 {
-    public string Name => "Что ты можешь";
+    public string Trigger => "Что ты можешь";
     public string Desc { get; } = "Get All Commands";
 
     public async Task Execute(Update update, ITelegramBotClient bot, ChatContext context)
