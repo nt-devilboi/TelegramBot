@@ -3,6 +3,7 @@ using System.Reflection;
 using EasyTgBot.Abstract;
 using EasyTgBot.controller;
 using EasyTgBot.ServiceCommand;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
@@ -21,40 +22,25 @@ public static class ExtensionBotTgDI
         serviceCollection.AddSingleton<ITelegramBotClient>(client);
     }
 
-    public static void AddTelegramCommands(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddTelegramCommands(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<ICommandCollection, CommandCollection>();
-    }
-
-    //todo: нужен рефакторинг.
-    public static void UseTgCommands(this IHost app)
-    {
-        var services = app.Services.CreateScope().ServiceProvider;
-
-        var commandsCollection = services.GetService<ICommandCollection>();
-        if (commandsCollection == null) throw new ApplicationException("NOT HAVE ADDED serviceCommands");
-
+        serviceCollection.AddScoped<IServiceRegistry<ICommand>, CommandServiceRegistry>();
         var assembly = Assembly.GetCallingAssembly();
         var commandsTypes = GetCommandsFrom(assembly);
         foreach (var commandsType in commandsTypes)
         {
-            var commandServices = services.GetFrom(commandsType);
-
-            var command = assembly.CreateInstanceCommand(commandServices, commandsType.FullName);
-            if (command == null) throw new ArgumentException($"command {commandsType.FullName} not create");
-
-            commandsCollection.Add(command);
+            serviceCollection.AddScoped<ICommand>(provider =>
+                (ICommand)ActivatorUtilities.CreateInstance(provider, commandsType));
         }
+
+        return serviceCollection;
     }
 
-    private static List<object> GetFrom(this IServiceProvider serviceCollection, Type typeCommand)
+    public static void AddTelegramContext(this IServiceCollection serviceCollection)
     {
-        return typeCommand.GetConstructors()[0]
-            .GetParameters()
-            .Select(parameter => serviceCollection
-                .GetService(parameter.ParameterType))
-            .ToList();
+        serviceCollection.AddScoped<IServiceRegistry<IContextHander>, ContextServiceRegistry>();
     }
+
 
     private static Type[] GetCommandsFrom(Assembly assembly)
     {

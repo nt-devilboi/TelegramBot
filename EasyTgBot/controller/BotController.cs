@@ -10,9 +10,9 @@ namespace EasyTgBot.controller;
 [Route("/api/message/update")]
 public class BotController(
     ITelegramBotClient telegramBotClient,
-    ICommandCollection serviceCommandCollection,
+    IServiceRegistry<ICommand> serviceServiceRegistry,
     IChatContextRepository chatContextRepository,
-    IContextProcess contextProcess)
+    IServiceRegistry<IContextHander> contextProcess)
 {
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Update? update)
@@ -20,26 +20,29 @@ public class BotController(
         if (update?.Message == null) return new OkResult();
 
 
-        var context = await chatContextRepository.Get(update.Message.Chat.Id);
+        var context = await chatContextRepository.Get(update.Message.Chat.Id) ?? NotAuthorized();
 
         var text = update.Message.Text;
-        if (text == null || !serviceCommandCollection.Contains(update.Message.Text))
+        if (!serviceServiceRegistry.Contains(update.Message.Text) && contextProcess.Contains(context.State.ToString()))
         {
-            await contextProcess.Handle(update, telegramBotClient, context ?? NotAuthorized());
-            return new OkResult();
+            await contextProcess.Get(context.State.ToString())
+                .Handle(update, telegramBotClient, context);
         }
 
-        var command = serviceCommandCollection.Get(text);
+        else
+        {
+            try
+            {
+                var command = serviceServiceRegistry.Get(text);
+                await command.Execute(update, telegramBotClient, context);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e); //todo поставить логер.
+                await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Твоя команда меня сломала");
+            }
+        }
 
-        try
-        {
-            await command.Execute(update, telegramBotClient, context ?? NotAuthorized());
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e); //todo поставить логер.
-            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Твоя команда меня сломала");
-        }
 
         return new OkResult();
     }
@@ -48,7 +51,7 @@ public class BotController(
     {
         return new ChatContext
         {
-            State = (int)ContextState.Public,
+            State = (int)BaseContextState.Public,
             Id = Guid.NewGuid(),
             Payload = ""
         };

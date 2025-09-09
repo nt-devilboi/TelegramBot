@@ -6,12 +6,12 @@ public static class ContextExtension
 {
     public static bool InUserAccount(this ChatContext context)
     {
-        return context.State == (int)ContextState.UserAccount;
+        return context.State == (int)BaseContextState.UserAccount;
     }
 
     public static bool InPublic(this ChatContext context)
     {
-        return context.State == (int)ContextState.Public;
+        return context.State == (int)BaseContextState.Public;
     }
 
 

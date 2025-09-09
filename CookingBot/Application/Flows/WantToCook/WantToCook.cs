@@ -1,7 +1,13 @@
 using System.Globalization;
+using CookingBot.Application.Commands;
+using CookingBot.Application.Commands.AddRecipe.Flow;
+using CookingBot.Application.Commands.AddRecipe.Flow.ContextHandlers;
+using CookingBot.Application.Flow;
+using CookingBot.Application.Flows.AddRecipe.InContexts;
+using CookingBot.Application.Flows.WantToCook.InContexts;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
-using CookingBot.Infrastructure.Repositories;
+using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
@@ -9,15 +15,17 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace CookingBot.Application.Commands.AddRecipe;
+namespace CookingBot.Application.Flows.WantToCook;
 
-public class WantToCook(IRecipeRepository recipeRepository) : ICommand
+public class WantToCook(IRecipeRepository recipeRepository, IChatContextRepository chatContextRepository) : ICommand
 {
-    public string Trigger { get; } = "Хочу приготовить";
+    public string Trigger { get; } = Phrase.WantToCook.IWantToCook;
     public string Desc { get; }
 
     public async Task Execute(Update update, ITelegramBotClient bot, ChatContext context = null)
     {
+        var cookContext =
+            ContextFactory<CookPayload, TransactionServiceCook, CookContext>.Create(context);
         if (context.InPublic())
         {
             await bot.SendTextMessageAsync(update.Message.Chat.Id, "Сначала нужно зарегистрироваться");
@@ -31,7 +39,7 @@ public class WantToCook(IRecipeRepository recipeRepository) : ICommand
         }
 
 
-        var textRequest = update.AsTextRequest();
+        var textRequest = update.AsRequestWithText();
         var recipes = await recipeRepository.Get(textRequest.GetChatId());
         if (recipes.Count == 0)
         {
@@ -40,28 +48,25 @@ public class WantToCook(IRecipeRepository recipeRepository) : ICommand
         }
 
 
-        await bot.SendTextMessageAsync(textRequest.GetChatId(), "Что хочешь приготовить?",
+        await bot.SendTextMessageAsync(textRequest.GetChatId(), Phrase.WantToCook.WhatDoYouWant,
             replyMarkup: new ReplyKeyboardMarkup(
                 GetButtons(recipes)));
-    }   
+
+        context.State = (int)CookContext.ChoosingDish;
+        await chatContextRepository.Upsert(context);
+    }
 
     private IEnumerable<KeyboardButton> GetButtons(IReadOnlyList<Recipe> recipes)
     {
-        var currentTime = DateTime.Now;
-
         foreach (var recipe in recipes)
         {
+            var date = recipe.WasCookedLastTime?.ToString("dd.mm.yyyy");
+            var stringData = date != null ? $"Готовилось {date}" : "Не готовил";
             if (recipe.WasCookedLastTime != null)
-                yield return new KeyboardButton(
-                    $"{recipe.nameRecipe}. Готовился {(currentTime - recipe.WasCookedLastTime).Value.Days} назад"); //нету слова день, так как нужны разные окончания
-            else
-            {
-                
-                yield return new KeyboardButton(
-                    $"{ToUpperFirst(recipe.nameRecipe)}. Не готовил");
-            }
+                yield return new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}. {stringData}");
         }
     }
+
 
     private string ToUpperFirst(string str)
     {

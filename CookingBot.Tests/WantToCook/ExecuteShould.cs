@@ -1,4 +1,5 @@
 using CookingBot.Application.Commands.AddRecipe;
+using CookingBot.Application.Flows.WantToCook;
 using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
 using CookingBot.Infrastructure.Repositories;

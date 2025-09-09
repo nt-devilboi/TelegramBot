@@ -22,4 +22,9 @@ public class RecipeRepository(ChatDb chatDb) : IRecipeRepository
     {
         return await chatDb.Recipes.Where(x => x.ChatId == chatId).ToListAsync();
     }
+
+    public async Task<Recipe?> Get(string name)
+    {
+        return await chatDb.Recipes.FirstOrDefaultAsync(x => x.nameRecipe.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+    }
 }

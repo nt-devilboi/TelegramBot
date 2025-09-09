@@ -6,4 +6,6 @@ public interface IRecipeRepository
 {
     Task Upsert(Recipe recipe);
     Task<IReadOnlyList<Recipe>> Get(long chatId);
+
+    Task<Recipe?> Get(string name);
 }
