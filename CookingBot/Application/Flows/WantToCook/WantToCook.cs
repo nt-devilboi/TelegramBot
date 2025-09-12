@@ -62,8 +62,7 @@ public class WantToCook(IRecipeRepository recipeRepository, IChatContextReposito
         {
             var date = recipe.WasCookedLastTime?.ToString("dd.mm.yyyy");
             var stringData = date != null ? $"Готовилось {date}" : "Не готовил";
-            if (recipe.WasCookedLastTime != null)
-                yield return new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}. {stringData}");
+            yield return new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}. {stringData}");
         }
     }
 

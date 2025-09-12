@@ -32,15 +32,7 @@ public class ExceptionHandlingMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-
-        var statusCode = exception switch
-        {
-            GoogleApiException googleEx => (int)googleEx.HttpStatusCode,
-            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-            _ => StatusCodes.Status500InternalServerError
-        };
-
-        context.Response.StatusCode = statusCode;
+        context.Response.StatusCode = 200;
 
         var response = new
         {

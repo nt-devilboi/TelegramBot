@@ -31,7 +31,7 @@ public class SaveRecipe(IRecipeRepository recipeRepository, IChatContextReposito
             new
                 Recipe() // если вдруг будет появляется возможность создать этот класс еще где-то, то тогда наверное это имеет смысл перенети в конструктор или в extension, так как уже будет код повторяться, а пока ожидается, что это будет только здесь.
                 {
-                    nameRecipe = payload.nameRecipe,
+                    nameRecipe = payload.nameRecipe.ToLower(),
                     Ingredients = payload.Ingredients,
                     Instruction = payload.Instruction,
                     Id = Guid.NewGuid(),

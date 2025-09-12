@@ -25,6 +25,6 @@ public class RecipeRepository(ChatDb chatDb) : IRecipeRepository
 
     public async Task<Recipe?> Get(string name)
     {
-        return await chatDb.Recipes.FirstOrDefaultAsync(x => x.nameRecipe.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+        return await chatDb.Recipes.FirstOrDefaultAsync(x => x.nameRecipe == name.ToLower());
     }
 }

@@ -1,7 +1,4 @@
-using CookingBot.Application.Commands.AddRecipe.Flow;
-using CookingBot.Application.Commands.AddRecipe.Flow.ContextHandlers;
 using CookingBot.Application.Flow;
-using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
@@ -10,7 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace CookingBot.Application.Flows.AddRecipe.Contexts.ContextHandlers;
+namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
 public class AddingIngredients(IChatContextRepository chatContextRepository) : IContextHander
 {
@@ -43,7 +40,6 @@ public class AddingIngredients(IChatContextRepository chatContextRepository) : I
 
     private static void AddIngredient(DetailContext<RecipePayload, AddingRecipeContext> context, string text)
     {
-        // пока есть косяк с инкасуляцией. мы меняет payload здесь, но не меняем json. сейчас это решает SaveChanges.
         if (!context.TryGetPayload(out var payload)) return;
 
         payload.Ingredients.TryAdd(text, new IngredientDetail(0, "штук"));

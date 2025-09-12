@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using EasyOAuth;
 using EasyOAuth.Builder;
@@ -7,7 +8,6 @@ using EasyTgBot.Abstract;
 using CookingBot;
 using CookingBot.Application.Commands.AddRecipe.Flow;
 using CookingBot.Application.Commands.AddRecipe.Flow.ContextHandlers;
-using CookingBot.Application.Flows.AddRecipe.Contexts.ContextHandlers;
 using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 using CookingBot.Application.Flows.WantToCook.InContexts;
@@ -18,6 +18,7 @@ using CookingBot.Infrastructure;
 using CookingBot.Infrastructure.DataBase;
 using CookingBot.Infrastructure.Repositories;
 using CookingBot.Infrastucture.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Vostok.Logging.Abstractions;
 using Vostok.Logging.Console;
 using Vostok.Logging.Microsoft;
@@ -54,11 +55,12 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddTransient<ChatDb>();
-
+builder.Services.AddOptions<PostgresEntryPointOptions>().BindConfiguration(PostgresEntryPointOptions.Section)
+    .ValidateDataAnnotations();
 // easyTg
 builder.Services.AddTelegramCommands().AddTelegramContext();
-builder.Services.AddTelegramBotWithController("https://8fd1b9be658e65.lhr.life",
-    Environment.GetEnvironmentVariable("TG_TOKEN", EnvironmentVariableTarget.User) ??
+builder.Services.AddTelegramBotWithController("https://6665bd0ac6f0bc.lhr.life",
+    Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
@@ -74,6 +76,10 @@ builder.Services.AddContext<CookContext>(x => x
     .AddHandler<Cooking>());
 
 var app = builder.Build();
+
+using var dbcontex = app.Services.GetService<ChatDb>();
+dbcontex.Database.Migrate();
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
@@ -90,3 +96,10 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+public class PostgresEntryPointOptions
+{
+    public const string Section = "PostgresEntryPoint";
+
+    [Required] public string ConnStr { get; init; }
+}
