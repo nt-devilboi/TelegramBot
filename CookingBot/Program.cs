@@ -33,19 +33,15 @@ oAuths.AddOAuth("google", _ =>
         .SetClientId(Environment.GetEnvironmentVariable("CLIENT_ID") ?? string.Empty)
         .SetClientSecret(Environment.GetEnvironmentVariable("CLIENT_SECRET") ?? string.Empty)
         .SetScope("email")
-        .SetRedirectUrl("http://localhost:5128/api/oauth")
+        .SetRedirectUrl(
+            Environment.GetEnvironmentVariable(
+                "REDIRECT_URI")) // api... не имеет смысла, так как оно в либе уже статичное
         .SetCustomQuery("grant_type", "authorization_code", QueryFor.GetAccessToken));
 
 builder.Services.AddOAuths<TelegramOAuth, LinkOauthRepository, StrategyToken>(oAuths);
 
 
-var log = new ConsoleLog(new ConsoleLogSettings
-{
-    ColorsEnabled = true
-});
-builder.Logging.ClearProviders();
-builder.Logging.AddVostok(log);
-builder.Services.AddSingleton<ILog>(log);
+builder.AddLog();
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 
@@ -55,11 +51,14 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddTransient<ChatDb>();
-builder.Services.AddOptions<PostgresEntryPointOptions>().BindConfiguration(PostgresEntryPointOptions.Section)
+builder.Services.AddOptions<PostgresEntryPointOptions>()
+    .Configure(x => x.ConnString = Environment.GetEnvironmentVariable("CONN_STRING"))
     .ValidateDataAnnotations();
 // easyTg
+
 builder.Services.AddTelegramCommands().AddTelegramContext();
-builder.Services.AddTelegramBotWithController("https://6665bd0ac6f0bc.lhr.life",
+builder.Services.AddTelegramBotWithController(
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://750adfb500c693.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
@@ -99,7 +98,7 @@ app.Run();
 
 public class PostgresEntryPointOptions
 {
-    public const string Section = "PostgresEntryPoint";
+    public const string Section = "Database";
 
-    [Required] public string ConnStr { get; init; }
+    public string ConnString { get; set; }
 }

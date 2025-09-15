@@ -29,7 +29,7 @@ public class BotController(
                 .Handle(update, telegramBotClient, context);
         }
 
-        else
+        else if (serviceServiceRegistry.Contains(update.Message.Text)) 
         {
             try
             {
@@ -41,6 +41,10 @@ public class BotController(
                 Console.WriteLine(e); //todo поставить логер.
                 await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Твоя команда меня сломала");
             }
+        }
+        else
+        {
+            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Я тебя не понимаю");
         }
 
 

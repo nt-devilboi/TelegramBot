@@ -12,6 +12,7 @@ namespace CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
 
 public class Cooking(IRecipeRepository recipeRepository, IChatContextRepository contextRepository) : IContextHander
 {
+    
     public async Task Handle(Update update, ITelegramBotClient bot, ChatContext context)
     {
         var request = update.AsRequestWithText();
@@ -22,7 +23,7 @@ public class Cooking(IRecipeRepository recipeRepository, IChatContextRepository 
             var recipe = await recipeRepository.Get(payload.NameRecipe);
             if (recipe == null) throw new ApplicationException($"рецепта с названием {payload.NameRecipe} не нашлось");
 
-            recipe.WasCookedLastTime = DateTime.Now;
+            recipe.WasCookedLastTime = DateTime.Now.ToUniversalTime();
 
             await recipeRepository.Upsert(recipe);
             await bot.SendTextMessageAsync(request.GetChatId(), "Я запомнил, когда ты приготовил");

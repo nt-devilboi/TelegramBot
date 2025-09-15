@@ -6,5 +6,5 @@ namespace EasyTgBot.Abstract;
 
 public interface IContextHander
 {
-    Task Handle(Update update,ITelegramBotClient bot, ChatContext context);
+    Task Handle(Update update, ITelegramBotClient bot, ChatContext context);
 }
