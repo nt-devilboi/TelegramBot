@@ -20,7 +20,12 @@ public partial class ChoosingDish(IRecipeRepository recipeRepository, IChatConte
     {
         var request = update.AsRequestWithText();
         var cookContext = ContextFactory<CookPayload, TransactionServiceCook, CookContext>.Create(context);
-        var recipe = await recipeRepository.Get(TakeNameDish().Match(request.Value).Value);
+        var recipeName = TakeNameDish().Match(request.Value).Value;
+        var recipe = await recipeRepository.Get(recipeName);
+        if (recipe == null)
+        {
+            await bot.SendTextMessageAsync(request.GetChatId(), $"нету рецепта с названием {recipeName}");
+        }
         var cook = new CookPayload(recipe.nameRecipe);
         cookContext.UpdatePayload(cook);
         await bot.SendTextMessageAsync(request.GetChatId(), $"Вот что нужно для блюда:");
