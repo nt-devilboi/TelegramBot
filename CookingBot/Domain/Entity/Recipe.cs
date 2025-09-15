@@ -14,6 +14,8 @@ public class Recipe
     public Dictionary<string, IngredientDetail> Ingredients { get; init; }
 
     public string Instruction { get; set; }
+    
+    public DateTime? WasCookedLastTime { get; set; }
 
     public long ChatId { get; set; }
 }

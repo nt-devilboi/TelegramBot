@@ -1,6 +1,7 @@
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
-using CookingBot.Infrastucture.DataBase;
+using CookingBot.Infrastructure.DataBase;
+using Microsoft.EntityFrameworkCore;
 using VkNet.Utils;
 
 namespace CookingBot.Infrastructure.Repositories;
@@ -17,8 +18,13 @@ public class RecipeRepository(ChatDb chatDb) : IRecipeRepository
         await chatDb.SaveChangesAsync();
     }
 
-    public IReadOnlyList<Recipe> Get(long chatId)
+    public async Task<IReadOnlyList<Recipe>> Get(long chatId)
     {
-        return chatDb.Recipes.Where(x => x.ChatId == chatId).ToReadOnlyCollection();
+        return await chatDb.Recipes.Where(x => x.ChatId == chatId).ToListAsync();
+    }
+
+    public async Task<Recipe?> Get(string name)
+    {
+        return await chatDb.Recipes.FirstOrDefaultAsync(x => x.nameRecipe == name.ToLower());
     }
 }

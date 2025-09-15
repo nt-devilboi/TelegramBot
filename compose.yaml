@@ -1,0 +1,39 @@
+﻿version: '3.8'
+
+services:
+  CookingBot:
+    env_file:
+      - ./CookingBot/.env
+    image: deviilboi99/cooking_bot
+    networks:
+      - my-network
+    depends_on:
+      - postgres
+    ports:
+      - "5128:8080"
+      
+    
+  
+  
+  postgres:
+    image: postgres:15
+    container_name: my_postgres
+    environment:
+      POSTGRES_DB: CookDb
+      POSTGRES_USER: devilboi
+      POSTGRES_PASSWORD: 123123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - my-network
+
+volumes:
+  postgres_data:
+    
+networks:
+  my-network:
+    driver: bridge

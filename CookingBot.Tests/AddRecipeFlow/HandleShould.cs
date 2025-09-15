@@ -1,5 +1,5 @@
+using CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 using CookingBot.Application.Interfaces;
-using CookingBot.Commands.AddRecipe.Flow;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Moq;
@@ -13,7 +13,7 @@ public class HandleShould
     private readonly Mock<IChatContextRepository> _chatContextRepositoryMock;
     private readonly Mock<IRecipeRepository> _recipeRepositoryMock;
     private readonly Mock<ITelegramBotClient> _telegramBotClientMock;
-    private readonly Application.Commands.AddRecipe.Flow.AddRecipeFlow _flow;
+    private readonly RecipeSetName _setName;
     private readonly ChatContext _chatContext;
     private readonly Update _update;
 
@@ -25,7 +25,7 @@ public class HandleShould
         _telegramBotClientMock = new Mock<ITelegramBotClient>();
 
         // Создаем экземпляр класса под тест
-        _flow = new Application.Commands.AddRecipe.Flow.AddRecipeFlow(
+        _setName = new RecipeSetName(
             _chatContextRepositoryMock.Object,
             _recipeRepositoryMock.Object
         );

@@ -26,12 +26,7 @@ public class StrategyToken : EasyOAuth.Abstraction.StrategyToken
     public override async Task Execute(string token, OAuthEntity data)
     {
         var telegramOAuth = data as TelegramOAuth;
-        var chatContext = new ChatContext
-        {
-            State = (int)ContextState.Menu,
-            Id = Guid.NewGuid(),
-            ChatId = telegramOAuth.chatId
-        };
+        var chatContext = ChatContext.CreateInAccountContext(telegramOAuth.chatId);
         var chat = new Chat
         {
             token = token,

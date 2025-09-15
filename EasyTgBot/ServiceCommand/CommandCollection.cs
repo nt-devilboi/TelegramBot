@@ -3,27 +3,25 @@ using EasyTgBot.BaseCommand;
 
 namespace EasyTgBot.ServiceCommand;
 
-public class CommandCollection : ICommandCollection
+internal class CommandServiceRegistry : IServiceRegistry<ICommand>
 {
     private readonly Dictionary<string, ICommand> _commands;
-    private readonly List<InfoCommand> _infoCommands; //todo: вот бы это не хранить как отдельный класс)))
 
-    public CommandCollection()
+    public CommandServiceRegistry(IEnumerable<ICommand> commands)
     {
-        _infoCommands = new List<InfoCommand>();
         _commands = new Dictionary<string, ICommand>();
 
-        Add(new Help(_infoCommands));
+        foreach (var command in commands)
+        {
+            Add(command);
+        }
     }
 
-    public void Add(ICommand command)
+
+    public void Add(ICommand command, string? key = null)
     {
-        if (!_commands.TryAdd(command.Name, command))
-            throw new ApplicationException($"command {command.Name} existed yet");
-
-
-        var info = new InfoCommand { Info = $"{command.Name} - {command.Desc}" };
-        _infoCommands.Add(info);
+        if (!_commands.TryAdd(command.Trigger, command))
+            throw new ApplicationException($"command {command.Trigger} is exist yet");
     }
 
     public bool Contains(string commandName)

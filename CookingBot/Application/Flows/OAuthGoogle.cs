@@ -1,15 +1,15 @@
 using EasyOAuth.Abstraction;
+using EasyTgBot;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bots.Types;
 using Vostok.Logging.Abstractions;
 using InlineKeyboardMarkup = Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup;
 using ParseMode = Telegram.Bot.Types.Enums.ParseMode;
 using Update = Telegram.Bot.Types.Update;
 
-namespace CookingBot.Commands;
+namespace CookingBot.Application.Commands;
 
 public class OAuthGoogle : ICommand
 {
@@ -23,19 +23,24 @@ public class OAuthGoogle : ICommand
         _log = log;
     }
 
-    public string Name => "Авторизоваться через google";
-    public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал, кто ты";
+    public string Trigger => "Авторизоваться";
+    public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал кто ты";
 
     public async Task Execute(Update update, ITelegramBotClient bot, ChatContext context = null)
     {
         var chatId = update.Message.Chat.Id;
 
-        if (context.State != (int)ContextState.NotAuthenticated)
+        if (context.InUserAccount())
         {
             await bot.SendTextMessageAsync(chatId, "Ты уже авторизован");
             return;
         }
 
+        if (context.InFlow())
+        {
+            await bot.SendTextMessageAsync(chatId, "Ты сейчас уже что-то делаешь");
+        }
+        
         _log.Info($"при созданий запроса chat id {chatId}");
         var bottons =
             new InlineKeyboardMarkup(InlineKeyboardButton.WithUrl(_text,

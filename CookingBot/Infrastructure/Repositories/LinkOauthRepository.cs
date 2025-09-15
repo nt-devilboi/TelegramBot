@@ -1,13 +1,13 @@
 using CookingBot.Domain.Entity;
-using CookingBot.Infrastucture.DataBase;
+using CookingBot.Infrastructure.DataBase;
 using EasyOAuth.Abstraction;
 using Microsoft.EntityFrameworkCore;
 
-namespace CookingBot.Infrastucture.Repositories;
+namespace CookingBot.Infrastructure.Repositories;
 
-public class LinkOauthRepository(ChatDb chatDbContext) : TokenLinkRepositoryBase
+public class LinkOauthRepository(ChatDb chatDbContext) : ITokenLinkRepository
 {
-    public override async Task Add(string Oauth, string state, string id)
+    public async Task Add(string Oauth, string state, string id)
     {
         var linkOauth = new TelegramOAuth
         {
@@ -21,17 +21,17 @@ public class LinkOauthRepository(ChatDb chatDbContext) : TokenLinkRepositoryBase
         await chatDbContext.SaveChangesAsync();
     }
 
-    public override Task<OAuthEntity> GetByExtraData(string extraData)
+    public Task<OAuthEntity> GetByExtraData(string extraData)
     {
         throw new NotImplementedException();
     }
 
-    public override async Task<OAuthEntity> GetByState(string state)
+    public async Task<OAuthEntity> GetByState(string state)
     {
         return await chatDbContext.LinkOAuths.FirstOrDefaultAsync(e => e.State == state);
     }
 
-    public override async Task Remove(OAuthEntity oAuthEntity)
+    public async Task Remove(OAuthEntity oAuthEntity)
     {
         chatDbContext.LinkOAuths.Remove(oAuthEntity as TelegramOAuth);
         await chatDbContext.SaveChangesAsync();

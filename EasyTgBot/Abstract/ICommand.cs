@@ -6,7 +6,7 @@ namespace EasyTgBot.Abstract;
 
 public interface ICommand
 {
-    public string Name { get; }
+    public string Trigger { get; }
 
     public string Desc { get; }
     public Task Execute(Update update, ITelegramBotClient bot, ChatContext context = null);
