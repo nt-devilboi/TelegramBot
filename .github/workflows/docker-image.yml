@@ -37,4 +37,22 @@ jobs:
         tags: |
           ${{secrets.DOCKER_USERNAME}}/cooking_bot:latest
           ${{secrets.DOCKER_USERNAME}}/cooking_bot:${{github.sha}}
+
+  deploy:
+    needs: build-and-push-docker-hub
+    runs-on: ubuntu-latest
+    environment: production
+    steps: 
+    - name: deploy to the server
+      uses: appleboy/ssh-actoin@v1.0.0
+      with: 
+        host: ${{secrets.HOST_IP}}
+        username: ${{secrets.HOST_USER}}
+        key: ${{secrets.SSH_KEY}}
+        script: |
+          cd /docker/
+          docker compose down
+          docker compose pull
+          docker compose up -d
+        
     
