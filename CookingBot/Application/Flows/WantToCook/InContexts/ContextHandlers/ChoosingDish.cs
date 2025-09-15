@@ -41,6 +41,6 @@ public partial class ChoosingDish(IRecipeRepository recipeRepository, IChatConte
         await chatContextRepository.Upsert(context);
     }
 
-    [GeneratedRegex(@"^.+(?=\.)")]
+    [GeneratedRegex(@"^.+(?=\. )")]
     private static partial Regex TakeNameDish();
 }
