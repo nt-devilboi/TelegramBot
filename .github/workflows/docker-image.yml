@@ -12,11 +12,10 @@ jobs:
 
     runs-on: ubuntu-latest
     
-  
-    
     steps:
     - name: check files before checkout 
-      run: ls
+      run: pwd
+
     
     - uses: actions/checkout@v4
     - name: Build the Docker image
