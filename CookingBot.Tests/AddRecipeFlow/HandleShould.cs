@@ -10,7 +10,7 @@ namespace CookingBot.Tests.AddRecipeFlow;
 
 public class HandleShould
 {
-    private readonly Mock<IChatContextRepository> _chatContextRepositoryMock;
+    private readonly Mock<IContextRepository> _chatContextRepositoryMock;
     private readonly Mock<IRecipeRepository> _recipeRepositoryMock;
     private readonly Mock<ITelegramBotClient> _telegramBotClientMock;
     private readonly RecipeSetName _setName;
@@ -20,7 +20,7 @@ public class HandleShould
     public HandleShould()
     {
         // Инициализация моков
-        _chatContextRepositoryMock = new Mock<IChatContextRepository>();
+        _chatContextRepositoryMock = new Mock<IContextRepository>();
         _recipeRepositoryMock = new Mock<IRecipeRepository>();
         _telegramBotClientMock = new Mock<ITelegramBotClient>();
 

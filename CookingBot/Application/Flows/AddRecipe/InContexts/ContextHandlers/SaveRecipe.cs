@@ -1,5 +1,4 @@
 using CookingBot.Application.Commands;
-using CookingBot.Application.Flow;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
@@ -11,21 +10,22 @@ using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
-public class SaveRecipe(IRecipeRepository recipeRepository, IChatContextRepository chatContextRepository)
-    : IContextHander
+public class SaveRecipe(
+    IRecipeRepository recipeRepository,
+    ITelegramBotClient botClient)
+    : ContextHandler<RecipePayload, AddingRecipeContext>
 {
-    public async Task Handle(Update update, ITelegramBotClient bot, ChatContext context)
+    protected override async Task Handle(Update update,
+        DetailContext<RecipePayload, AddingRecipeContext> context)
     {
-        var recipeContext =
-            ContextFactory<RecipePayload, TransactionServiceRecipe, AddingRecipeContext>.Create(context);
         var request = update.AsRequestWithText();
         if (request.Value != "Сохранить")
         {
-            await bot.SendTextMessageAsync(request.GetChatId(), "Я тебя не понимаю");
+            await botClient.SendTextMessageAsync(request.GetChatId(), "Я тебя не понимаю");
             return;
         }
 
-        if (!recipeContext.TryGetPayload(out var payload)) return;
+        if (!context.TryGetPayload(out var payload)) return;
 
         var recipe =
             new
@@ -41,8 +41,7 @@ public class SaveRecipe(IRecipeRepository recipeRepository, IChatContextReposito
         await recipeRepository.Upsert(recipe);
 
 
-        await bot.SendTextMessageAsync(request.GetChatId(), Phrase.Recipe.Save);
-        recipeContext.ToUserAccount();
-        await chatContextRepository.Upsert(context);
+        await botClient.SendTextMessageAsync(request.GetChatId(), Phrase.Recipe.Save);
+        context.ToUserAccount();
     }
 }

@@ -10,4 +10,4 @@ public record RecipePayload : BasePayload
     public string Instruction { get; init; }
 }
 
-public record IngredientDetail(uint Count, string Measurement);
+public record IngredientDetail(uint Units, string Measurement);

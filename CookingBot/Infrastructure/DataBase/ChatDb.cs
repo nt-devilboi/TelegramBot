@@ -15,7 +15,7 @@ public class ChatDb(IOptions<PostgresEntryPointOptions> options) : DbContext
     public DbSet<Recipe> Recipes { get; set; }
     private readonly string ConnectionString = options.Value.ConnString;
 
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql(ConnectionString);

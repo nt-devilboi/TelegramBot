@@ -1,38 +1,37 @@
 using CookingBot.Application.Commands;
-using CookingBot.Application.Flow;
-using CookingBot.Application.Interfaces;
-using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
-public class RecipeSetName(IChatContextRepository chatContextRepository, IRecipeRepository recipeRepository)
-    : IContextHander
+public class RecipeSetName(IContextRepository contextRepository, ITelegramBotClient botClient)
+    : ContextHandler<RecipePayload, AddingRecipeContext>
 {
-    public async Task Handle(Update update, ITelegramBotClient bot, ChatContext context)
+    protected override async Task Handle(Update update,
+        DetailContext<RecipePayload, AddingRecipeContext> context)
     {
         if (string.IsNullOrEmpty(update.Message.Text)) return;
 
 
         if (update.Message.Text == Triggers.AddRecipe.ShowResult)
         {
-            await bot.SendTextMessageAsync(update.Message.Chat.Id,
-                string.IsNullOrEmpty(context.Payload) ? "У меня нету данных" : context.Payload);
+            if (context.TryGetPayload(out var payload))
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, payload.nameRecipe);
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Нету данных");
+            }
+
             return;
         }
 
-        var recipeContext =
-            ContextFactory<RecipePayload, TransactionServiceRecipe, AddingRecipeContext>.Create(context);
 
-
-        await SetName(update.AsRequestWithText(), bot, recipeContext);
-
-        await chatContextRepository.Upsert(context);
+        await SetName(update.AsRequestWithText(), botClient, context);
     }
 
 

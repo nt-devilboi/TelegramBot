@@ -1,53 +1,53 @@
-using CookingBot.Application.Flow;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
-public class AddingIngredients(IChatContextRepository chatContextRepository) : IContextHander
+public class AddingIngredients(ITelegramBotClient botClient)
+    : ContextHandler<RecipePayload, AddingRecipeContext>
 {
-    public async Task Handle(Update update, ITelegramBotClient bot, ChatContext context)
+    protected override async Task Handle(Update update,
+        DetailContext<RecipePayload, AddingRecipeContext> recipeContext)
     {
-        var recipeContext =
-            ContextFactory<RecipePayload, TransactionServiceRecipe, AddingRecipeContext>.Create(context);
         var request = update.AsRequestWithText();
         var text = request.Value;
         if (request.Value == "Закончить")
         {
-            await bot.SendTextMessageAsync(request.GetChatId(), "Теперь давай инструкцию");
+            await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь давай инструкцию");
             recipeContext.NextState();
-            await chatContextRepository.Upsert(context);
             return;
         }
 
-        AddIngredient(recipeContext, text);
+        if (AddIngredient(recipeContext, text))
+        {
+            await botClient.SendTextMessageAsync(request.GetChatId(), "Ты это уже добавил или что-то пошло не так");
+            return;
+        }
 
 
-        await bot.SendTextMessageAsync(request.GetChatId(), "Добавить еще",
+        await botClient.SendTextMessageAsync(request.GetChatId(), "Добавить еще?",
             replyMarkup: new ReplyKeyboardMarkup
             ([
                 ["Закончить"]
             ]));
-
-        await chatContextRepository.Upsert(context);
     }
 
 
-    private static void AddIngredient(DetailContext<RecipePayload, AddingRecipeContext> context, string text)
+    private static bool AddIngredient(DetailContext<RecipePayload, AddingRecipeContext> context, string text)
     {
-        if (!context.TryGetPayload(out var payload)) return;
+        if (!context.TryGetPayload(out var payload) ||
+            !payload.Ingredients.TryAdd(text, new IngredientDetail(0, "штук"))) return false;
 
-        payload.Ingredients.TryAdd(text, new IngredientDetail(0, "штук"));
+
         var ingredient = payload.Ingredients[text];
-        ingredient = ingredient with { Count = ingredient.Count + 1 };
 
         payload.Ingredients[text] = ingredient;
 
         context.UpdatePayload(payload);
+        return true;
     }
 }

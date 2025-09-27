@@ -10,54 +10,23 @@ namespace EasyTgBot.controller;
 [Route("/api/message/update")]
 public class BotController(
     ITelegramBotClient telegramBotClient,
-    IServiceRegistry<ICommand> serviceServiceRegistry,
-    IChatContextRepository chatContextRepository,
-    IServiceRegistry<IContextHander> contextProcess)
+    IUpdateProcess updateProcess)
 {
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Update? update)
     {
         if (update?.Message == null) return new OkResult();
 
-
-        var context = await chatContextRepository.Get(update.Message.Chat.Id) ?? NotAuthorized();
-
-        var text = update.Message.Text;
-        if (!serviceServiceRegistry.Contains(update.Message.Text) && contextProcess.Contains(context.State.ToString()))
+        try
         {
-            await contextProcess.Get(context.State.ToString())
-                .Handle(update, telegramBotClient, context);
+            await updateProcess.Update(update);
         }
-
-        else if (serviceServiceRegistry.Contains(update.Message.Text)) 
+        catch (Exception e)
         {
-            try
-            {
-                var command = serviceServiceRegistry.Get(text);
-                await command.Execute(update, telegramBotClient, context);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e); //todo поставить логер.
-                await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Твоя команда меня сломала");
-            }
+            Console.WriteLine(e);
+            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Я сломался из за команды");
         }
-        else
-        {
-            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Я тебя не понимаю");
-        }
-
 
         return new OkResult();
-    }
-
-    private ChatContext NotAuthorized()
-    {
-        return new ChatContext
-        {
-            State = (int)BaseContextState.Public,
-            Id = Guid.NewGuid(),
-            Payload = ""
-        };
     }
 }

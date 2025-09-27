@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CookingBot.Infrastructure.Repositories;
 
-public class ChatContextRepository(ChatDb dbContext) : IChatContextRepository
+public class ContextRepository(ChatDb dbContext) : IContextRepository
 {
     public async Task Upsert(ChatContext chatContext)
     {

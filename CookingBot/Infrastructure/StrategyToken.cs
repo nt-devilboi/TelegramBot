@@ -7,38 +7,29 @@ using Vostok.Logging.Abstractions;
 
 namespace CookingBot.Infrastructure;
 
-public class StrategyToken : EasyOAuth.Abstraction.StrategyToken
+public class StrategyToken(
+    ILog log,
+    ITelegramBotClient bot,
+    IChatRepository chatRepository,
+    IContextRepository contextRepository)
+    : EasyOAuth.Abstraction.StrategyToken
 {
-    private readonly ITelegramBotClient _bot;
-    private readonly IChatContextRepository _chatContextRepository;
-    private readonly IChatRepository _chatRepository;
-    private readonly ILog _log;
-
-    public StrategyToken(ILog log, ITelegramBotClient bot, IChatRepository chatRepository,
-        IChatContextRepository chatContextRepository)
-    {
-        _log = log;
-        _bot = bot;
-        _chatRepository = chatRepository;
-        _chatContextRepository = chatContextRepository;
-    }
-
     public override async Task Execute(string token, OAuthEntity data)
     {
         var telegramOAuth = data as TelegramOAuth;
         var chatContext = ChatContext.CreateInAccountContext(telegramOAuth.chatId);
         var chat = new Chat
         {
-            token = token,
+            Token = token,
             Id = telegramOAuth.chatId,
         };
 
-        await _chatRepository.Add(chat);
-        await _chatContextRepository.Upsert(chatContext);
+        await chatRepository.Add(chat);
+        await contextRepository.Upsert(chatContext);
 
-        _log.Info($"{telegramOAuth.chatId}");
+        log.Info($"Token was linked with {telegramOAuth.chatId}");
 
 
-        await _bot.SendTextMessageAsync(telegramOAuth.chatId, "authosiziation is succesful");
+        await bot.SendTextMessageAsync(telegramOAuth.chatId, "authosiziation is succesful");
     }
 }

@@ -2,6 +2,6 @@ namespace EasyTgBot.Entity;
 
 public class Chat
 {
-    public long Id { get; set; }
-    public string token { get; set; }
+    public required long Id { get; init; }
+    public required string Token { get; init; }
 }
