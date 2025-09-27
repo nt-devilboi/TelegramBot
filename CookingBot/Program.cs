@@ -1,13 +1,9 @@
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using EasyOAuth;
 using EasyOAuth.Builder;
 using EasyOAuth.Extensions;
 using EasyTgBot;
 using EasyTgBot.Abstract;
 using CookingBot;
-using CookingBot.Application.Commands.AddRecipe.Flow;
-using CookingBot.Application.Commands.AddRecipe.Flow.ContextHandlers;
 using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 using CookingBot.Application.Flows.WantToCook.InContexts;
@@ -19,9 +15,6 @@ using CookingBot.Infrastructure.DataBase;
 using CookingBot.Infrastructure.Repositories;
 using CookingBot.Infrastucture.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Vostok.Logging.Abstractions;
-using Vostok.Logging.Console;
-using Vostok.Logging.Microsoft;
 
 var builder = WebApplication.CreateBuilder(args);
 var oAuths = OAuths.CreateBuilder();
@@ -56,24 +49,27 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
     .ValidateDataAnnotations();
 // easyTg
 
-builder.Services.AddTelegramCommands().AddTelegramContext();
+builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://750adfb500c693.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://d1fd941eaecf2c.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
-builder.Services.AddScoped<IChatContextRepository, ChatContextRepository>();
+builder.Services.AddScoped<IContextRepository, ContextRepository>();
+
+var registerFlow = new ServiceRegistryFlow();
 builder.Services.AddContext<AddingRecipeContext>(x => x
     .AddHandler<RecipeSetName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()
-    .AddHandler<SaveRecipe>());
-//
+    .AddHandler<SaveRecipe>(), registerFlow);
+
 builder.Services.AddContext<CookContext>(x => x
     .AddHandler<ChoosingDish>()
-    .AddHandler<Cooking>());
+    .AddHandler<Cooking>(), registerFlow);
 
+builder.Services.AddSingleton<IServiceRegistryFlow>(registerFlow);
 var app = builder.Build();
 
 using var dbcontex = app.Services.GetService<ChatDb>();

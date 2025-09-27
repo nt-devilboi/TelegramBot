@@ -1,4 +1,4 @@
-namespace CookingBot.Application.Commands;
+namespace CookingBot.Application.Flows;
 
 public static class Triggers
 {

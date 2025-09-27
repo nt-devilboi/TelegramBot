@@ -1,34 +1,35 @@
-using CookingBot.Application.Flow;
-using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace CookingBot.Application.Commands.AddRecipe.Flow.ContextHandlers;
+namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
-public class AddingInstruction(IChatContextRepository chatContextRepository) : IContextHander
+public class AddingInstruction(IContextRepository contextRepository, ITelegramBotClient botClient)
+    : ContextHandler<RecipePayload, AddingRecipeContext>
 {
-    public async Task Handle(Update update, ITelegramBotClient bot, ChatContext context)
+    protected override async Task Handle(Update update,
+        DetailContext<RecipePayload, AddingRecipeContext> context)
     {
-        var recipeContext =
-            ContextFactory<RecipePayload, TransactionServiceRecipe, AddingRecipeContext>.Create(context);
         var request = update.AsRequestWithText();
-        if (recipeContext.TryGetPayload(out var payload))
+        if (context.TryGetPayload(out var payload))
         {
             payload = payload with { Instruction = request.Value };
-            await bot.SendTextMessageAsync(request.GetChatId(), "Готово",
-                replyMarkup: new ReplyKeyboardMarkup
-                ([
-                    ["Сохранить"]
-                ]));
-            recipeContext.UpdatePayload(payload)
+            context.UpdatePayload(payload)
                 .NextState();
 
-            await chatContextRepository.Upsert(context);
+            await botClient.SendTextMessageAsync(request.GetChatId(), "Готово", replyMarkup: GetSaveButton());
         }
     }
+
+    private static ReplyKeyboardMarkup GetSaveButton()
+    {
+        return new ReplyKeyboardMarkup
+        ([
+            ["Сохранить"]
+        ]);
+    }
 }
+// а норм ли что инфу про следующие иструкцию даёт прошошлая. не слишком ли появляетяс зависимость.

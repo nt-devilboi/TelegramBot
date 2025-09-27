@@ -19,4 +19,9 @@ public static class ContextExtension
     {
         return !context.InUserAccount() && !context.InPublic();
     }
+
+    public static void ToUserAccount(this ChatContext context)
+    {
+        context.State = (int)BaseContextState.UserAccount;
+    }
 }

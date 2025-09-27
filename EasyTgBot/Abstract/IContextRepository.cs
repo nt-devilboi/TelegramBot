@@ -2,7 +2,7 @@ using EasyTgBot.Entity;
 
 namespace EasyTgBot.Abstract;
 
-public interface IChatContextRepository
+public interface IContextRepository
 {
     Task Upsert(ChatContext chatContext);
 

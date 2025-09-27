@@ -1,60 +1,57 @@
 using EasyTgBot.Abstract;
-using EasyTgBot.ServiceCommand;
 using Microsoft.Extensions.DependencyInjection;
+using Stateless;
 
 namespace EasyTgBot;
 
 public static class ContextAddExtension
 {
     public static void AddContext<TEnum>(this IServiceCollection serviceCollection,
-        Action<BuilderRegistryContext> builderFunc) where TEnum : struct, Enum
+        Action<BuilderContextFlow<TEnum>> builderFunc, IServiceRegistryFlow registryFlow) where TEnum : struct, Enum
     {
         // достаём из serivceCollection
 
         var start = (int)(object)Enum.GetValues<TEnum>().Min();
         var end = (int)(object)Enum.GetValues<TEnum>().Max();
-        var builder = new BuilderRegistryContext(serviceCollection, start, end);
+        var builder = new BuilderContextFlow<TEnum>(serviceCollection, new RangeFlowComponents(start, end));
 
         builderFunc(builder);
+
+        registryFlow.AddFlow<TEnum>(builder.Steps);
     }
 }
 
-public class BuilderRegistryContext
+[Obsolete] // как только
+internal static class ConfigurationStateMachine
 {
-    private readonly IServiceCollection _collection;
-    private int _cur;
-    private readonly int _end;
-
-    internal BuilderRegistryContext(IServiceCollection collection,
-        int cur, int end)
+    public static StateMachine<TState, Trigger> BaseConfiguration<TState>(
+        this StateMachine<TState, Trigger> stateMachine)
+        where TState : struct, Enum
     {
-        _collection = collection;
-        _cur = cur;
-        _end = end;
-    }
+        var enums = Enum.GetValues<TState>();
 
-
-    public BuilderRegistryContext AddHandler<TContextHandler>() where TContextHandler : class
-    {
-        if (_cur > _end)
+        for (var i = 1; i < enums.Length; i++)
         {
-            throw new ArgumentException("capacity for handler is exhausted");
+            var k = stateMachine.Configure(enums[i - 1]);
+            k.Permit(Trigger.UserWantToContinue, enums[i]);
         }
 
-        _collection.AddScoped<TContextHandler>(x =>
-            (TContextHandler)ActivatorUtilities.CreateInstance(x, typeof(TContextHandler)));
-
-        AddHandlerInfo<TContextHandler>(_cur.ToString());
-        _cur++;
-
-        return this;
-    }
-
-    private void AddHandlerInfo<TContextHandler>(string cur) where TContextHandler : class
-    {
-        _collection.AddScoped<HandlerInfo>(x =>
-            new HandlerInfo((IContextHander)x.GetService(typeof(TContextHandler)), cur));
+        return stateMachine;
     }
 }
 
-internal record HandlerInfo(IContextHander ContextHander, string number);
+public class RangeFlowComponents(int start, int end)
+{
+    private int _cur = start;
+    private readonly int _start = start;
+
+    public bool IsStart => _start == _cur;
+    public int PrevHandler { get; set; } = start;
+
+    public bool Empty => _cur > end;
+    public int GetIdFreeComponent => _cur;
+
+    public void Next() => _cur++;
+}
+
+internal record IHandlerInfo(IContextHandler ContextHandler, string number);

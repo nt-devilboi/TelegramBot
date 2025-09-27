@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using CookingBot.Application.Commands;
-using CookingBot.Application.Flow;
 using CookingBot.Application.Flows.ExtentsionCook;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Payloads;
@@ -13,34 +12,37 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
 
-public partial class ChoosingDish(IRecipeRepository recipeRepository, IChatContextRepository chatContextRepository)
-    : IContextHander
+public partial class ChoosingDish(
+    IRecipeRepository recipeRepository,
+    IContextRepository contextRepository,
+    ITelegramBotClient botClient)
+    : ContextHandler<CookPayload, CookContext>
 {
-    public async Task Handle(Update update, ITelegramBotClient bot, ChatContext context)
+    [GeneratedRegex(@"^.+(?=\. )")]
+    private static partial Regex TakeNameDish();
+
+    protected override async Task Handle(Update update, DetailContext<CookPayload, CookContext> context)
     {
         var request = update.AsRequestWithText();
-        var cookContext = ContextFactory<CookPayload, TransactionServiceCook, CookContext>.Create(context);
         var recipeName = TakeNameDish().Match(request.Value).Value;
         var recipe = await recipeRepository.Get(recipeName);
         if (recipe == null)
         {
-            await bot.SendTextMessageAsync(request.GetChatId(), $"нету рецепта с названием {recipeName}");
+            await botClient.SendTextMessageAsync(request.GetChatId(), $"Нету рецепта с названием {recipeName}");
+            return;
         }
+
         var cook = new CookPayload(recipe.nameRecipe);
-        cookContext.UpdatePayload(cook);
-        await bot.SendTextMessageAsync(request.GetChatId(), $"Вот что нужно для блюда:");
-        await bot.SendTextMessageAsync(request.GetChatId(), recipe.GetIngredientsList());
-        await bot.SendTextMessageAsync(request.GetChatId(), $"Инструкция:\n {recipe.Instruction}");
-        await bot.SendTextMessageAsync(request.GetChatId(), "Скажешь как приготовишь",
+        context.UpdatePayload(cook);
+        await botClient.SendTextMessageAsync(request.GetChatId(), $"Вот что нужно для блюда:");
+        await botClient.SendTextMessageAsync(request.GetChatId(), recipe.GetIngredientsList());
+        await botClient.SendTextMessageAsync(request.GetChatId(), $"Инструкция:\n {recipe.Instruction}");
+        await botClient.SendTextMessageAsync(request.GetChatId(), "Скажешь как приготовишь",
             replyMarkup: new ReplyKeyboardMarkup
             ([
                 [Phrase.WantToCook.ICooked]
             ]));
 
-        cookContext.NextState();
-        await chatContextRepository.Upsert(context);
+        context.NextState();
     }
-
-    [GeneratedRegex(@"^.+(?=\. )")]
-    private static partial Regex TakeNameDish();
 }

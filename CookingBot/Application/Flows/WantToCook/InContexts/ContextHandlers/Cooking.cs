@@ -1,24 +1,26 @@
 using CookingBot.Application.Commands;
-using CookingBot.Application.Flow;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Vostok.Logging.Abstractions;
 
 namespace CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
-
-public class Cooking(IRecipeRepository recipeRepository, IChatContextRepository contextRepository) : IContextHander
+//todo: насчёт upsert иногда будут команды без изменнеия context но upsert в любом случае выполнится, поэтому можно либо возвращать true false. detail context в abstract классе существует там можно знать про изменения. 
+public class Cooking(
+    IRecipeRepository recipeRepository,
+    IContextRepository contextRepository,
+    ITelegramBotClient botClient,
+    ILog log) : ContextHandler<CookPayload, CookContext>
 {
-    
-    public async Task Handle(Update update, ITelegramBotClient bot, ChatContext context)
+    protected override async Task Handle(Update update, DetailContext<CookPayload, CookContext> context)
     {
+        log.Info("the user starts to cook");
         var request = update.AsRequestWithText();
-        var cookContext = ContextFactory<CookPayload, TransactionServiceCook, CookContext>.Create(context);
 
-        if (Phrase.WantToCook.ICooked == request.Value && cookContext.TryGetPayload(out var payload))
+        if (Phrase.WantToCook.ICooked == request.Value && context.TryGetPayload(out var payload))
         {
             var recipe = await recipeRepository.Get(payload.NameRecipe);
             if (recipe == null) throw new ApplicationException($"рецепта с названием {payload.NameRecipe} не нашлось");
@@ -26,10 +28,11 @@ public class Cooking(IRecipeRepository recipeRepository, IChatContextRepository 
             recipe.WasCookedLastTime = DateTime.Now.ToUniversalTime();
 
             await recipeRepository.Upsert(recipe);
-            await bot.SendTextMessageAsync(request.GetChatId(), "Я запомнил, когда ты приготовил");
-            cookContext.ToUserAccount();
-
-            await contextRepository.Upsert(context);
+            await botClient.SendTextMessageAsync(request.GetChatId(), "Я запомнил, когда ты приготовил");
+            context.ToUserAccount();
         }
+
+
+        log.Info($"the user {update.Message.From.Username} ends to cook");
     }
 }

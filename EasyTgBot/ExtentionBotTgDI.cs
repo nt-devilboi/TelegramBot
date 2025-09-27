@@ -1,16 +1,12 @@
-using System.Globalization;
 using System.Reflection;
 using EasyTgBot.Abstract;
 using EasyTgBot.controller;
-using EasyTgBot.ServiceCommand;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 
 namespace EasyTgBot;
 
-public static class ExtensionBotTgDI
+public static class ExtensionBotTgDi
 {
     public static void AddTelegramBotWithController(this IServiceCollection serviceCollection, string host,
         string token)
@@ -20,11 +16,13 @@ public static class ExtensionBotTgDI
         var webhook = $"{host}/api/message/update";
         client.SetWebhookAsync(webhook).Wait();
         serviceCollection.AddSingleton<ITelegramBotClient>(client);
+        serviceCollection.AddScoped<IUpdateProcess, UpdateProcess>();
+        serviceCollection.AddScoped<IMessageHandler, MessageHandler>();
+        serviceCollection.AddScoped<IContextFactory, ContextFactory>();
     }
 
     public static IServiceCollection AddTelegramCommands(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<IServiceRegistry<ICommand>, CommandServiceRegistry>();
         var assembly = Assembly.GetCallingAssembly();
         var commandsTypes = GetCommandsFrom(assembly);
         foreach (var commandsType in commandsTypes)
@@ -36,11 +34,6 @@ public static class ExtensionBotTgDI
         return serviceCollection;
     }
 
-    public static void AddTelegramContext(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddScoped<IServiceRegistry<IContextHander>, ContextServiceRegistry>();
-    }
-
 
     private static Type[] GetCommandsFrom(Assembly assembly)
     {
@@ -48,16 +41,5 @@ public static class ExtensionBotTgDI
             .GetTypes()
             .Where(t => t.GetInterface(typeof(ICommand).ToString()) != null)
             .ToArray();
-    }
-
-    private static ICommand? CreateInstanceCommand(this Assembly assembly, List<object> servicesForCommand,
-        string fullName)
-    {
-        return assembly.CreateInstance(fullName,
-            false,
-            BindingFlags.Public | BindingFlags.Instance,
-            null,
-            servicesForCommand.ToArray(), CultureInfo.CurrentCulture,
-            null) as ICommand;
     }
 }

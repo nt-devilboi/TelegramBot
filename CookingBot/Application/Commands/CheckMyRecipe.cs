@@ -5,19 +5,21 @@ using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace CookingBot.Application.Commands;
+namespace CookingBot.Application.Flows;
 
-public class CheckMyRecipe(IRecipeRepository recipeRepository) : ICommand
+public class CheckMyRecipe(IRecipeRepository recipeRepository, ITelegramBotClient botClient) : ICommand
 {
     public string Trigger { get; } = "Покажи мой рецепты";
     public string Desc { get; }
 
 
-    public async Task Execute(Update update, ITelegramBotClient bot, ChatContext context)
+    public Priority Priority { get; } = Priority.Command;
+
+    public async Task Execute(Update update, ChatContext context)
     {
         var recipes = await recipeRepository.Get(update.Message.Chat.Id);
 
-        await bot.SendTextMessageAsync(update.Message.Chat.Id, GetRecipes(recipes));
+        await botClient.SendTextMessageAsync(update.Message.Chat.Id, GetRecipes(recipes));
     }
 
 
@@ -33,6 +35,6 @@ public class CheckMyRecipe(IRecipeRepository recipeRepository) : ICommand
     private static string GetIngredientsList(Recipe x)
     {
         return string.Join("\n", x.Ingredients.Select((ing, i) =>
-            $" {i + 1}. {ing.Key}: {ing.Value.Count} {ing.Value.Measurement}"));
+            $" {i + 1}. {ing.Key}: {ing.Value.Units} {ing.Value.Measurement}"));
     }
 }
