@@ -25,6 +25,6 @@ public class RecipeRepository(ChatDb chatDb) : IRecipeRepository
 
     public async Task<Recipe?> Get(string name)
     {
-        return await chatDb.Recipes.FirstOrDefaultAsync(x => x.nameRecipe == name.ToLower());
+        return await chatDb.Recipes.FirstOrDefaultAsync(x => EF.Functions.ILike(x.nameRecipe, name));
     }
 }

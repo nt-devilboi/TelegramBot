@@ -7,6 +7,7 @@ using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
@@ -42,6 +43,11 @@ public class SaveRecipe(
 
 
         await botClient.SendTextMessageAsync(request.GetChatId(), Phrase.Recipe.Save);
+        await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь можешь выполнить эти команды",
+            replyMarkup: new ReplyKeyboardMarkup([
+                CheckMyRecipe.staticTrigger,
+                WantToCook.WantToCook.StaticTrigger
+            ]));
         context.ToUserAccount();
     }
 }

@@ -3,7 +3,6 @@ using CookingBot.Application.Commands;
 using CookingBot.Application.Flows.WantToCook.InContexts;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
-using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
@@ -17,9 +16,10 @@ public class WantToCook(
     IRecipeRepository recipeRepository,
     ITelegramBotClient botClient) : ICommand
 {
-    public string Trigger { get; } = Phrase.WantToCook.IWantToCook;
+    public string Trigger { get; } = StaticTrigger;
     public string Desc { get; }
-
+    
+    public static readonly string StaticTrigger = "Хочу приготовить";
     public Priority Priority { get; } = Priority.Command;
 
 
