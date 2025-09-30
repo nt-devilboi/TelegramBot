@@ -34,11 +34,19 @@ public class DetailContext<TPayload, TState>
         return false;
     }
 
+    public long ChatId => _chatContext.ChatId;
 
     public DetailContext<TPayload, TState> NextState()
     {
         _stateMachine.Fire(Trigger.UserWantToContinue);
         return this;
+    }
+
+    public void GoTo(TState state)
+    {
+        var triggerWithParameters =
+            new StateMachine<TState, Trigger>.TriggerWithParameters<string>(Trigger.UserGoToSubTask);
+        _stateMachine.Fire(triggerWithParameters, state.ToString());
     }
 
     public DetailContext<TPayload, TState> ToUserAccount()

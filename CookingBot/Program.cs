@@ -6,6 +6,7 @@ using EasyTgBot.Abstract;
 using CookingBot;
 using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
+using CookingBot.Application.Flows.EditRecipe.InContext;
 using CookingBot.Application.Flows.WantToCook.InContexts;
 using CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
 using CookingBot.Application.Interfaces;
@@ -14,7 +15,9 @@ using CookingBot.Infrastructure;
 using CookingBot.Infrastructure.DataBase;
 using CookingBot.Infrastructure.Repositories;
 using CookingBot.Infrastucture.Repositories;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
+using EditContext = CookingBot.Application.Flows.EditRecipe.EditContext;
 
 var builder = WebApplication.CreateBuilder(args);
 var oAuths = OAuths.CreateBuilder();
@@ -51,7 +54,7 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://d1fd941eaecf2c.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://ec87ee00a26208.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
@@ -68,6 +71,11 @@ builder.Services.AddContext<AddingRecipeContext>(x => x
 builder.Services.AddContext<CookContext>(x => x
     .AddHandler<ChoosingDish>()
     .AddHandler<Cooking>(), registerFlow);
+
+builder.Services.AddContext<EditContext>(x =>
+        x.AddHandler<ChooseEditItem>().AddHandler<SwitchPlace>(x => x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>()),
+    registerFlow);
+
 
 builder.Services.AddSingleton<IServiceRegistryFlow>(registerFlow);
 var app = builder.Build();

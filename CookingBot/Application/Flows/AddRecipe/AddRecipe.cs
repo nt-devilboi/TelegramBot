@@ -10,9 +10,9 @@ namespace CookingBot.Application.Flows.AddRecipe;
 public class AddRecipe(ITelegramBotClient botClient)
     : ICommand
 {
-    public string Trigger { get; } = "Добавить рецепт";
+    public string Trigger { get; } = StaticTrigger;
     public string Desc { get; }
-
+    public static readonly string StaticTrigger = "Добавить рецепт";
     public Priority Priority { get; } = Priority.Command;
 
     public async Task Execute(Update request, ChatContext context)

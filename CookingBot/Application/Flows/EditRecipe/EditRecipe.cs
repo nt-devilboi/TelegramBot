@@ -1,22 +1,39 @@
+using System.Globalization;
+using CookingBot.Application.Flows.EditRecipe.InContext;
+using CookingBot.Application.Interfaces;
+using CookingBot.Domain.Entity;
 using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.EditRecipe;
 
-/*public class EditRecipe : ICommand
+public class EditRecipe(IRecipeRepository repository, ITelegramBotClient botClient) : ICommand
 {
     public string Trigger { get; } = "Редактировать рецепт";
+    public Priority Priority { get; } = Priority.Command;
+
     public string Desc { get; }
-    public Task Execute(Update update, ITelegramBotClient bot, ChatContext context = null)
+
+    public async Task Execute(Update update, ChatContext context)
     {
-        
+        var recipes = await repository.Get(context.ChatId);
+
+        await botClient.SendTextMessageAsync(context.ChatId, "Какой рецепт хочешь отредактировать",
+            replyMarkup: new ReplyKeyboardMarkup(GetButtons(recipes)));
+        context.State = (int)EditContext.ChooseEditItem;
     }
-    
-    
-    public Task Execute(Update update, ITelegramBotClient bot, DetailContext<BasePayload, Enum> context = null)
+
+
+    private IEnumerable<KeyboardButton> GetButtons(IReadOnlyList<Recipe> recipes)
     {
-        
+        return recipes.Select(recipe => new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}"));
     }
-}*/
+
+    private static string ToUpperFirst(string str)
+    {
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str);
+    }
+}

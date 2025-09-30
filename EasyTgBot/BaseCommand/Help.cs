@@ -7,7 +7,7 @@ namespace EasyTgBot.BaseCommand;
 
 public class Help(List<InfoCommand> infoCommands, ITelegramBotClient botClient) : ICommand
 {
-    public string Trigger => "Что ты можешь";
+    public string Trigger { get; } = "Что ты можешь";
     public string Desc { get; } = "Get All Commands";
 
     public Priority Priority { get; } = Priority.SystemCommand;

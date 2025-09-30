@@ -9,14 +9,15 @@ using InlineKeyboardMarkup = Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarku
 using ParseMode = Telegram.Bot.Types.Enums.ParseMode;
 using Update = Telegram.Bot.Types.Update;
 
-namespace CookingBot.Application.Flows;
+namespace CookingBot.Application.Commands;
 
 public class OAuthGoogle(IOAuthClient authClient, ILog log, ITelegramBotClient botClient)
     : ICommand
 {
     private readonly string _text = "Google";
+    public static readonly string StaticTrigger = "Авторизоваться";
 
-    public string Trigger => "Авторизоваться";
+    public string Trigger { get; } = StaticTrigger;
     public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал кто ты";
 
     public Priority Priority { get; } = Priority.Command;
@@ -41,7 +42,7 @@ public class OAuthGoogle(IOAuthClient authClient, ILog log, ITelegramBotClient b
             new InlineKeyboardMarkup(InlineKeyboardButton.WithUrl(_text,
                 await authClient.GetOAuthRequest("google",
                     chatId.ToString())));
-        
+
         await botClient.SendTextMessageAsync(chatId.ToString(), "выбери где авторизоваться", parseMode: ParseMode.Html,
             replyMarkup: bottons);
     }

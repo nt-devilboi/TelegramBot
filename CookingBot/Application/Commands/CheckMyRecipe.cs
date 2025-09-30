@@ -5,13 +5,13 @@ using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace CookingBot.Application.Flows;
+namespace CookingBot.Application.Commands;
 
 public class CheckMyRecipe(IRecipeRepository recipeRepository, ITelegramBotClient botClient) : ICommand
 {
-    public string Trigger { get; } = "Покажи мой рецепты";
+    public string Trigger { get; } = staticTrigger;
+    public static string staticTrigger = "Покажи рецепт";
     public string Desc { get; }
-
 
     public Priority Priority { get; } = Priority.Command;
 

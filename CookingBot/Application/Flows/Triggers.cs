@@ -14,7 +14,6 @@ public static class Phrase
 public class WantToCookPhrase
 {
     public string WhatDoYouWant = "Что хочешь приготовить?";
-    public string IWantToCook = "Хочу приготовить";
     public string ICooked = "Приготовил";
 }
 
