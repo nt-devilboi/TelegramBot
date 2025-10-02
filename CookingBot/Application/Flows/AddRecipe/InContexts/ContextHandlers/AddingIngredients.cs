@@ -22,7 +22,7 @@ public class AddingIngredients(ITelegramBotClient botClient)
             return;
         }
 
-        if (AddIngredient(recipeContext, text))
+        if (!AddIngredient(recipeContext, text))
         {
             await botClient.SendTextMessageAsync(request.GetChatId(), "Ты это уже добавил или что-то пошло не так");
             return;

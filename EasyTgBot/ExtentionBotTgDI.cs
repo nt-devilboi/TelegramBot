@@ -1,6 +1,7 @@
 using System.Reflection;
 using EasyTgBot.Abstract;
 using EasyTgBot.controller;
+using EasyTgBot.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
 
@@ -19,6 +20,15 @@ public static class ExtensionBotTgDi
         serviceCollection.AddScoped<IUpdateProcess, UpdateProcess>();
         serviceCollection.AddScoped<IMessageHandler, MessageHandler>();
         serviceCollection.AddScoped<IContextFactory, ContextFactory>();
+    }
+
+    public static void AddTelegramDbContext<TDb>(this IServiceCollection serviceCollection) where TDb : ChatDb
+    {
+        serviceCollection.AddDbContext<TDb>();
+        serviceCollection.AddDbContext<ChatDb, TDb>();
+
+        serviceCollection.AddScoped<IChatRepository, ChatRepository>();
+        serviceCollection.AddScoped<IContextRepository, ContextRepository>();
     }
 
     public static IServiceCollection AddTelegramCommands(this IServiceCollection serviceCollection)
