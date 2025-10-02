@@ -14,7 +14,7 @@ using CookingBot.Domain.Entity;
 using CookingBot.Infrastructure;
 using CookingBot.Infrastructure.DataBase;
 using CookingBot.Infrastructure.Repositories;
-using CookingBot.Infrastucture.Repositories;
+using EasyTgBot.Infrastructure;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using EditContext = CookingBot.Application.Flows.EditRecipe.EditContext;
@@ -46,7 +46,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddTransient<ChatDb>();
 builder.Services.AddOptions<PostgresEntryPointOptions>()
     .Configure(x => x.ConnString = Environment.GetEnvironmentVariable("CONN_STRING"))
     .ValidateDataAnnotations();
@@ -54,12 +53,13 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://ec87ee00a26208.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://2e0f6f6c671d6d.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
-builder.Services.AddScoped<IChatRepository, ChatRepository>();
+builder.Services.AddTelegramDbContext<ChatTelegramDb>();
+
+
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
-builder.Services.AddScoped<IContextRepository, ContextRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
 builder.Services.AddContext<AddingRecipeContext>(x => x
@@ -73,14 +73,16 @@ builder.Services.AddContext<CookContext>(x => x
     .AddHandler<Cooking>(), registerFlow);
 
 builder.Services.AddContext<EditContext>(x =>
-        x.AddHandler<ChooseEditItem>().AddHandler<SwitchPlace>(x => x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>()),
+        x.AddHandler<ChooseEditItem>()
+            .AddHandler<SwitchPlace>(x => x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>()),
     registerFlow);
 
 
 builder.Services.AddSingleton<IServiceRegistryFlow>(registerFlow);
 var app = builder.Build();
 
-using var dbcontex = app.Services.GetService<ChatDb>();
+using var scope = app.Services.CreateScope();
+using var dbcontex = scope.ServiceProvider.GetService<ChatTelegramDb>();
 dbcontex.Database.Migrate();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

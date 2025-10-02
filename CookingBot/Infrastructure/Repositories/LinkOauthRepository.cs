@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CookingBot.Infrastructure.Repositories;
 
-public class LinkOauthRepository(ChatDb chatDbContext) : ITokenLinkRepository
+public class LinkOauthRepository(ChatTelegramDb chatTelegramDbContext) : ITokenLinkRepository
 {
     public async Task Add(string Oauth, string state, string id)
     {
@@ -17,8 +17,8 @@ public class LinkOauthRepository(ChatDb chatDbContext) : ITokenLinkRepository
         };
 
 
-        chatDbContext.LinkOAuths.Add(linkOauth);
-        await chatDbContext.SaveChangesAsync();
+        chatTelegramDbContext.LinkOAuths.Add(linkOauth);
+        await chatTelegramDbContext.SaveChangesAsync();
     }
 
     public Task<OAuthEntity> GetByExtraData(string extraData)
@@ -28,12 +28,12 @@ public class LinkOauthRepository(ChatDb chatDbContext) : ITokenLinkRepository
 
     public async Task<OAuthEntity> GetByState(string state)
     {
-        return await chatDbContext.LinkOAuths.FirstOrDefaultAsync(e => e.State == state);
+        return await chatTelegramDbContext.LinkOAuths.FirstOrDefaultAsync(e => e.State == state);
     }
 
     public async Task Remove(OAuthEntity oAuthEntity)
     {
-        chatDbContext.LinkOAuths.Remove(oAuthEntity as TelegramOAuth);
-        await chatDbContext.SaveChangesAsync();
+        chatTelegramDbContext.LinkOAuths.Remove(oAuthEntity as TelegramOAuth);
+        await chatTelegramDbContext.SaveChangesAsync();
     }
 }
