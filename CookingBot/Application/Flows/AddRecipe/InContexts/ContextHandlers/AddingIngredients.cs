@@ -18,7 +18,7 @@ public class AddingIngredients(ITelegramBotClient botClient)
 
         if (request.Value == "Закончить") // если уж мы базарим про разные middleware, то можно сделать middleware, который берёт ответственность за переход на слеюудщий этап контекста.
         {
-            await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь давай инструкцию");
+            await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь напиши инструкцию");
             context.State.Continue();
             return;
         }
@@ -27,7 +27,7 @@ public class AddingIngredients(ITelegramBotClient botClient)
 
         if (!parsedText.isValid)
         {
-            await botClient.SendTextMessageAsync(context.ChatId, "Напиши например так: яйцо 3 штуки");
+            await botClient.SendTextMessageAsync(context.ChatId, "Я так не понимаю. Напиши пожалуйста в таком стиле: \"яйца 3 штуки\"");
             return;
         }
 
@@ -38,7 +38,7 @@ public class AddingIngredients(ITelegramBotClient botClient)
         }
 
 
-        await botClient.SendTextMessageAsync(request.GetChatId(), "Добавить еще?",
+        await botClient.SendTextMessageAsync(request.GetChatId(), "Добавил. Можешь добавить еще",
             replyMarkup: new ReplyKeyboardMarkup
             ([
                 ["Закончить"]

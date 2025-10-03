@@ -9,9 +9,8 @@ namespace CookingBot.Application.Commands;
 
 public class Exit(IContextRepository contextRepository, ITelegramBotClient botClient) : ICommand
 {
-    public string Trigger { get; } = StaticTrigger;
+    public string Trigger { get; } = "Выйти";
     public string Desc { get; }
-    public static string StaticTrigger = "Выйти";
     public Priority Priority { get; } = Priority.SystemCommand;
 
 
