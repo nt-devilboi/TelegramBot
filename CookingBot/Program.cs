@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using EditContext = CookingBot.Application.Flows.EditRecipe.EditContext;
 
 var builder = WebApplication.CreateBuilder(args);
-var oAuths = OAuths.CreateBuilder("https://t.me/nt_devilboi_testBot");
+var oAuths = OAuths.CreateBuilder(Environment.GetEnvironmentVariable("REDIRECT_URI_OATUTH") ?? throw new Exception("\"REDIRECT_URI_OATUTH\" ENV VAR doesn't exist")); // это редирект когда уже авторизация заверешна и нужно переправить обратно в тг канал.
 oAuths.AddOAuth("google", _ =>
     _.SetUriPageAuth("https://accounts.google.com/o/oauth2/v2/auth")
         .SetUriGetAccessToken("https://oauth2.googleapis.com/token")
@@ -51,7 +51,7 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://4123f809bb1952.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://ea1d11f5944ed6.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
