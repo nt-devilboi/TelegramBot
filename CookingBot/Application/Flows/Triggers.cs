@@ -19,7 +19,7 @@ public class WantToCookPhrase
 
 public class RecipePhrase
 {
-    public readonly string AskIngredients = "Какие ингредиенты";
+    public readonly string AskIngredients = "Теперь давай добавим ингредиенты\n. Пиши по одному ингредиенту";
     public readonly string Save = "Сохранил!";
 }
 
