@@ -18,6 +18,6 @@ public class EditInstruction(IRecipeRepository recipeRepository, ITelegramBotCli
         await recipeRepository.Upsert(oldPayload);
 
         await botClient.SendTextMessageAsync(context.ChatId, "Инструкцию изменил");
-        context.ToUserAccount();
+        context.Reset();
     }
 }

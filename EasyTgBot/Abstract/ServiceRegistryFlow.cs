@@ -6,10 +6,10 @@ public interface IServiceRegistryFlow
 {
     void AddFlow<TState>(List<StateEvent> stateEvents);
 
-    StateMachine<TState, Trigger> Wraps<TState>(StateMachine<TState, Trigger> stateMachine) where TState : struct, Enum;
+    IStateMachine<TState> Wraps<TState>(StateMachine<TState, Trigger> stateMachine) where TState : struct, Enum;
 }
 
-public class ServiceRegistryFlow : IServiceRegistryFlow
+public class ServiceRegistryFlow : IServiceRegistryFlow // мб в будущем сделать internal
 {
     private readonly Dictionary<Type, List<StateEvent>> Flows = new();
 
@@ -18,7 +18,7 @@ public class ServiceRegistryFlow : IServiceRegistryFlow
         Flows.Add(typeof(TState), stateEvents);
     }
 
-    public StateMachine<TState, Trigger> Wraps<TState>(StateMachine<TState, Trigger> stateMachine)
+    public IStateMachine<TState> Wraps<TState>(StateMachine<TState, Trigger> stateMachine)
         where TState : struct, Enum
 
     {
@@ -42,7 +42,7 @@ public class ServiceRegistryFlow : IServiceRegistryFlow
         }
 
 
-        return stateMachine;
+        return new StateMachine<TState>(stateMachine);
     }
 }
 

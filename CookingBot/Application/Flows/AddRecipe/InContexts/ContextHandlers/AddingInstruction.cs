@@ -17,9 +17,8 @@ public class AddingInstruction(IContextRepository contextRepository, ITelegramBo
         if (context.TryGetPayload(out var payload))
         {
             payload = payload with { Instruction = request.Value };
-            context.UpdatePayload(payload)
-                .NextState();
-
+            context.UpdatePayload(payload).State.Continue();
+            
             await botClient.SendTextMessageAsync(request.GetChatId(), "Готово", replyMarkup: GetSaveButton());
         }
     }

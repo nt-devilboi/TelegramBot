@@ -9,15 +9,15 @@ public class DetailContext<TPayload, TState>
     where TPayload : BasePayload
 {
     private TPayload? _payload;
-    private readonly StateMachine<TState, Trigger> _stateMachine;
+    public readonly IStateMachine<TState> State;
     private readonly ChatContext _chatContext;
 
     internal DetailContext(ChatContext chatContext, IServiceRegistryFlow registryFlow)
     {
-        _stateMachine = new StateMachine<TState, Trigger>(() => (TState)(object)chatContext.State,
+        var stateMachine = new StateMachine<TState, Trigger>(() => (TState)(object)chatContext.State,
             x => chatContext.State = (int)(object)x);
 
-        registryFlow.Wraps(_stateMachine);
+        State = registryFlow.Wraps(stateMachine);
         _chatContext = chatContext;
         _payload = JsonConvert.DeserializeObject<TPayload>(_chatContext.Payload ?? string.Empty);
     }
@@ -36,22 +36,10 @@ public class DetailContext<TPayload, TState>
 
     public long ChatId => _chatContext.ChatId;
 
-    public DetailContext<TPayload, TState> NextState()
-    {
-        _stateMachine.Fire(Trigger.UserWantToContinue);
-        return this;
-    }
-
-    public void GoTo(TState state)
-    {
-        var triggerWithParameters =
-            new StateMachine<TState, Trigger>.TriggerWithParameters<string>(Trigger.UserGoToSubTask);
-        _stateMachine.Fire(triggerWithParameters, state.ToString());
-    }
-
-    public DetailContext<TPayload, TState> ToUserAccount()
+    public DetailContext<TPayload, TState> Reset()
     {
         _chatContext.ToUserAccount();
+        _chatContext.Payload = null;
         return this;
     }
 

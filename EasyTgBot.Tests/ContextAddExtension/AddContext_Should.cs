@@ -29,7 +29,8 @@ public class Tests
                 .AddHandler<FakeHandler>(),
             serviceRegistry);
 
-        var stateMachine = serviceRegistry.Wraps(new StateMachine<TestUserFlow, Trigger>(TestUserFlow.Authorization));
+        var stateMachine = new StateMachine<TestUserFlow, Trigger>(TestUserFlow.Authorization);
+        serviceRegistry.Wraps(stateMachine);
 
         var enums = Enum.GetValues<TestUserFlow>();
         var states = stateMachine.GetInfo().States.ToArray();
@@ -41,7 +42,8 @@ public class Tests
 
 
         states[0].Substates.ToArray()[0].UnderlyingState.Should().Be(TestUserFlow.AddSecondName);
-        var userGoToSubTask = new StateMachine<TestUserFlow, Trigger>.TriggerWithParameters<string>(Trigger.UserGoToSubTask);
+        var userGoToSubTask =
+            new StateMachine<TestUserFlow, Trigger>.TriggerWithParameters<string>(Trigger.UserGoToSubTask);
 
         stateMachine.State.Should().Be(TestUserFlow.Authorization);
         stateMachine.Fire(Trigger.UserCompletedSubTask);
@@ -67,7 +69,7 @@ public class FakeHandler : ContextHandler<BasePayload, TestUserFlow>
 {
     protected override async Task Handle(Update update, DetailContext<BasePayload, TestUserFlow> context)
     {
-        context.NextState();
+        context.State.Continue();
     }
 }
 
@@ -75,6 +77,6 @@ public class FakeHandler2 : ContextHandler<BasePayload, TestUserFlow>
 {
     protected override async Task Handle(Update update, DetailContext<BasePayload, TestUserFlow> context)
     {
-        context.NextState();
+        context.State.Continue();
     }
 }
