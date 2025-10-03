@@ -14,13 +14,11 @@ using CookingBot.Domain.Entity;
 using CookingBot.Infrastructure;
 using CookingBot.Infrastructure.DataBase;
 using CookingBot.Infrastructure.Repositories;
-using EasyTgBot.Infrastructure;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using EditContext = CookingBot.Application.Flows.EditRecipe.EditContext;
 
 var builder = WebApplication.CreateBuilder(args);
-var oAuths = OAuths.CreateBuilder();
+var oAuths = OAuths.CreateBuilder("https://t.me/nt_devilboi_testBot");
 oAuths.AddOAuth("google", _ =>
     _.SetUriPageAuth("https://accounts.google.com/o/oauth2/v2/auth")
         .SetUriGetAccessToken("https://oauth2.googleapis.com/token")
@@ -53,7 +51,7 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://7ec5a52a867d58.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://4123f809bb1952.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();

@@ -12,7 +12,7 @@ public class StartCommand(ITelegramBotClient botClient) : ICommand
 
     public async Task Execute(Update update, ChatContext context)
     {
-        await botClient.SendTextMessageAsync(context.ChatId, "Привет сначала нужно авторизоваться",
+        await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Привет сначала нужно авторизоваться",
             replyMarkup: new ReplyKeyboardMarkup("Авторизоваться"));
     }
 
