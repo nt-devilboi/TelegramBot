@@ -48,6 +48,6 @@ public class SaveRecipe(
                 CheckMyRecipe.staticTrigger,
                 WantToCook.WantToCook.StaticTrigger
             ]));
-        context.ToUserAccount();
+        context.Reset();
     }
 }

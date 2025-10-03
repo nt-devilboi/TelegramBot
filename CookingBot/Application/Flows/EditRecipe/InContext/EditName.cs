@@ -17,6 +17,6 @@ public class EditName(IRecipeRepository recipeRepository, ITelegramBotClient bot
         await recipeRepository.Upsert(oldPayload);
 
         await botClient.SendTextMessageAsync(context.ChatId, "Сохранил изменение");        
-        context.ToUserAccount();
+        context.Reset();
     }
 }

@@ -53,7 +53,7 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://2e0f6f6c671d6d.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://7ec5a52a867d58.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
@@ -74,7 +74,8 @@ builder.Services.AddContext<CookContext>(x => x
 
 builder.Services.AddContext<EditContext>(x =>
         x.AddHandler<ChooseEditItem>()
-            .AddHandler<SwitchPlace>(x => x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>()),
+            .AddHandler<SwitchEditItem>(x =>
+                x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>().AddSubHandler<EditIngredients>()),
     registerFlow);
 
 

@@ -11,7 +11,7 @@ public class Recipe
 
     [Column(TypeName = "jsonb")]
     
-    public Dictionary<string, IngredientDetail> Ingredients { get; init; }
+    public Dictionary<string, IngredientDetail> Ingredients { get; set; }
 
     public string Instruction { get; set; }
     

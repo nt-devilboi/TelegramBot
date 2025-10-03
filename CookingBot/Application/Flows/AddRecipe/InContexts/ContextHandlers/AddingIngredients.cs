@@ -11,18 +11,27 @@ public class AddingIngredients(ITelegramBotClient botClient)
     : ContextHandler<RecipePayload, AddingRecipeContext>
 {
     protected override async Task Handle(Update update,
-        DetailContext<RecipePayload, AddingRecipeContext> recipeContext)
+        DetailContext<RecipePayload, AddingRecipeContext> context)
     {
         var request = update.AsRequestWithText();
-        var text = request.Value;
-        if (request.Value == "Закончить")
+
+
+        if (request.Value == "Закончить") // если уж мы базарим про разные middleware, то можно сделать middleware, который берёт ответственность за переход на слеюудщий этап контекста.
         {
             await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь давай инструкцию");
-            recipeContext.NextState();
+            context.State.Continue();
             return;
         }
 
-        if (!AddIngredient(recipeContext, text))
+        var parsedText = Parse(request.Value);
+
+        if (!parsedText.isValid)
+        {
+            await botClient.SendTextMessageAsync(context.ChatId, "Напиши например так: яйцо 3 штуки");
+            return;
+        }
+
+        if (!AddIngredient(context, parsedText))
         {
             await botClient.SendTextMessageAsync(request.GetChatId(), "Ты это уже добавил или что-то пошло не так");
             return;
@@ -37,17 +46,26 @@ public class AddingIngredients(ITelegramBotClient botClient)
     }
 
 
-    private static bool AddIngredient(DetailContext<RecipePayload, AddingRecipeContext> context, string text)
+    private static bool AddIngredient(DetailContext<RecipePayload, AddingRecipeContext> context,
+        (string name, uint unit, string measurement, bool isValid) ingredient)
     {
         if (!context.TryGetPayload(out var payload) ||
-            !payload.Ingredients.TryAdd(text, new IngredientDetail(0, "штук"))) return false;
-
-
-        var ingredient = payload.Ingredients[text];
-
-        payload.Ingredients[text] = ingredient;
+            !payload.Ingredients.TryAdd(ingredient.name, new IngredientDetail(ingredient.unit, ingredient.measurement)))
+            return false;
 
         context.UpdatePayload(payload);
         return true;
+    }
+
+    private (string name, uint unit, string measurement, bool isValid) Parse(string text)
+    {
+        var data = text.Split(" ", 3);
+        if (data.Length != 3 || !uint.TryParse(data[1], out var unit))
+        {
+            return (default, default, default, false)!;
+        }
+
+
+        return (data[0], unit, data[2], true);
     }
 }

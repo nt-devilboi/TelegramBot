@@ -44,7 +44,7 @@ public class RecipeSetName(IContextRepository contextRepository, ITelegramBotCli
         };
 
         context.UpdatePayload(payload)
-            .NextState();
+            .State.Continue();
 
 
         await botClient.SendTextMessageAsync(request.GetChatId(), Phrase.Recipe.AskIngredients);

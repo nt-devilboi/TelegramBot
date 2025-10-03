@@ -14,7 +14,6 @@ namespace CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
 
 public partial class ChoosingDish(
     IRecipeRepository recipeRepository,
-    IContextRepository contextRepository,
     ITelegramBotClient botClient)
     : ContextHandler<CookPayload, CookContext>
 {
@@ -43,6 +42,6 @@ public partial class ChoosingDish(
                 [Phrase.WantToCook.ICooked]
             ]));
 
-        context.NextState();
+        context.State.Continue();
     }
 }

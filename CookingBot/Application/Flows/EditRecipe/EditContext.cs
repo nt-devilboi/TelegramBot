@@ -5,5 +5,6 @@ public enum EditContext
     ChooseEditItem = 10100,
     SwitchEdit,
     EditInstruction,
-    EditName
+    EditName,
+    EditIngredients
 }

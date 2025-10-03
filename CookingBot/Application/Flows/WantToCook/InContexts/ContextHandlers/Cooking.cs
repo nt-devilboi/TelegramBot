@@ -29,7 +29,7 @@ public class Cooking(
 
             await recipeRepository.Upsert(recipe);
             await botClient.SendTextMessageAsync(request.GetChatId(), "Я запомнил, когда ты приготовил");
-            context.ToUserAccount();
+            context.Reset();
         }
 
 
