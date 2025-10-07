@@ -50,6 +50,10 @@ internal class MessageHandler : IMessageHandler
             return;
         }
 
+        if (context.State == (int)BaseContextState.UserMenu)
+        {
+            
+        }
         await _botClient.SendTextMessageAsync(update.GetChatId(), "я не понял твоего сообщения");
     }
 }

@@ -13,7 +13,7 @@ public class HandleShould
     private readonly Mock<IContextRepository> _chatContextRepositoryMock;
     private readonly Mock<IRecipeRepository> _recipeRepositoryMock;
     private readonly Mock<ITelegramBotClient> _telegramBotClientMock;
-    private readonly RecipeSetName _setName;
+    private readonly AddingName _setName;
     private readonly ChatContext _chatContext;
     private readonly Update _update;
 
@@ -25,7 +25,7 @@ public class HandleShould
         _telegramBotClientMock = new Mock<ITelegramBotClient>();
 
         // Создаем экземпляр класса под тест
-        _setName = new RecipeSetName(
+        _setName = new AddingName(
             _chatContextRepositoryMock.Object,
             _recipeRepositoryMock.Object
         );

@@ -6,7 +6,7 @@ public static class ContextExtension
 {
     public static bool InUserAccount(this ChatContext context)
     {
-        return context.State == (int)BaseContextState.UserAccount;
+        return context.State == (int)BaseContextState.UserMenu;
     }
 
     public static bool InPublic(this ChatContext context)
@@ -22,6 +22,6 @@ public static class ContextExtension
 
     public static void ToUserAccount(this ChatContext context)
     {
-        context.State = (int)BaseContextState.UserAccount;
+        context.State = (int)BaseContextState.UserMenu;
     }
 }

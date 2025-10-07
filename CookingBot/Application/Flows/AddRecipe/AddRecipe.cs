@@ -24,7 +24,6 @@ public class AddRecipe(ITelegramBotClient botClient)
             await botClient.SendTextMessageAsync(chatId, "Сначала нужно авторизоваться");
             return;
         }
-
         if (context.InUserAccount())
         {
             context.State = (int)AddingRecipeContext.AddingName;

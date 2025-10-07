@@ -9,7 +9,6 @@ public interface ICommand : IHandler
 
     public string Desc { get; }
     public Priority Priority { get; }
-    public abstract Task Execute(Update update, ChatContext context);
 }
 
 public enum Priority

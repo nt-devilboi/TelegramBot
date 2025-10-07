@@ -1,4 +1,3 @@
-using CookingBot.Application.Commands;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
@@ -7,7 +6,7 @@ using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
-public class RecipeSetName(ITelegramBotClient botClient)
+public class AddingName(ITelegramBotClient botClient)
     : ContextHandler<RecipePayload, AddingRecipeContext>
 {
     protected override async Task Handle(Update update,

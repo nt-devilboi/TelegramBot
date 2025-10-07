@@ -13,9 +13,6 @@ public abstract class ContextHandler<TPayload, TState> : IContextHandler
     async Task IContextHandler.Handle(Update update, ChatContext context, IContextFactory? contextFactory)
     {
         var detailContext = contextFactory.Create<TPayload, TState>(context);
-        await Handle(update,detailContext);
-        
+        await Handle(update,detailContext);}
 
-        
-    }
 }
