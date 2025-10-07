@@ -1,16 +1,18 @@
+using System.Globalization;
 using CookingBot.Application.Interfaces;
+using CookingBot.Domain.Entity;
 using EasyTgBot.Abstract;
+using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.EditRecipe.InContext;
 
-public class ChooseEditItem(ITelegramBotClient botClient, IRecipeRepository recipeRepository)
+public class ChooseEditRecipe(ITelegramBotClient botClient, IRecipeRepository recipeRepository)
     : ContextHandler<ChoseRecipePayload, EditContext>
 {
-    public static (string name, string instuction, string ingredints) Buttons = ("Название", "Инструкцию", "Ингредиенты");
-
+    
     protected override async Task Handle(Update update, DetailContext<ChoseRecipePayload, EditContext> context)
     {
         var nameRecipe = update.Message.Text;
@@ -29,8 +31,23 @@ public class ChooseEditItem(ITelegramBotClient botClient, IRecipeRepository reci
 
         context.UpdatePayload(new ChoseRecipePayload(nameRecipe));
         context.State.Continue();
+    }
 
-        await botClient.SendTextMessageAsync(context.ChatId, "Что хочешь изменить?",
-            replyMarkup: new ReplyKeyboardMarkup([Buttons.name, Buttons.instuction, Buttons.ingredints]));
+    protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
+    {
+        var recipes = await recipeRepository.Get(context.ChatId);
+
+        await botClient.SendTextMessageAsync(context.ChatId, "Какой рецепт хочешь отредактировать",
+            replyMarkup: new ReplyKeyboardMarkup(GetButtons(recipes)));
+    }
+    
+    private IEnumerable<KeyboardButton> GetButtons(IReadOnlyList<Recipe> recipes)
+    {
+        return recipes.Select(recipe => new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}"));
+    }
+
+    private static string ToUpperFirst(string str)
+    {
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str);
     }
 }

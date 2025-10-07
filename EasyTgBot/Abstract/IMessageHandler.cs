@@ -29,31 +29,34 @@ internal class MessageHandler : IMessageHandler
     // в принципе у обоих сущностей один интерфейс.
     public async Task Handle(TelegramRequest<string> update, ChatContext context)
     {
-        if (_commands.TryGetValue(update.Value, out var command) && command.Priority == Priority.SystemCommand)
+        if (!_commands.TryGetValue(update.Value, out var command) &
+             !_contexts.TryGetValue(context.State.ToString(), out var contextHandler))
+            await _botClient.SendTextMessageAsync(update.GetChatId(), "я не понял твоего сообщения");
+
+
+        var oldState = context.State;
+        if (command is { Priority: Priority.SystemCommand })
         {
             await command.Execute(update.Update, context);
             await _contextRepository.Upsert(context);
             return;
         }
 
-        if (_contexts.TryGetValue(context.State.ToString(), out var contextHandler))
+        if (contextHandler != null)
         {
             await contextHandler.Handle(update.Update, context, _contextFactory);
             await _contextRepository.Upsert(context);
-            return;
         }
 
-        if (command != null)
+        if (command is { Priority: Priority.Command })
         {
             await command.Execute(update.Update, context);
             await _contextRepository.Upsert(context);
-            return;
         }
 
-        if (context.State == (int)BaseContextState.UserMenu)
+        if (context.State != oldState && _contexts.TryGetValue(context.State.ToString(), out contextHandler))
         {
-            
+            await contextHandler.Enter(context, _contextFactory);
         }
-        await _botClient.SendTextMessageAsync(update.GetChatId(), "я не понял твоего сообщения");
     }
 }

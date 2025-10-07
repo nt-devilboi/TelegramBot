@@ -9,10 +9,18 @@ public abstract class ContextHandler<TPayload, TState> : IContextHandler
     protected abstract Task Handle(Update update,
         DetailContext<TPayload, TState> context);
 
+    protected abstract Task Enter(DetailContext<TPayload, TState> context);
 
-    async Task IContextHandler.Handle(Update update, ChatContext context, IContextFactory? contextFactory)
+    async Task IContextHandler.Handle(Update update, ChatContext context, IContextFactory contextFactory)
     {
         var detailContext = contextFactory.Create<TPayload, TState>(context);
-        await Handle(update,detailContext);}
+        await Handle(update, detailContext);
+    }
 
+
+    async Task IContextHandler.Enter(ChatContext context, IContextFactory contextFactory)
+    {
+        var detailContext = contextFactory.Create<TPayload, TState>(context);
+        await Enter(detailContext);
+    }
 }

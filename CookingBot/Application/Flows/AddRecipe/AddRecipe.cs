@@ -27,8 +27,6 @@ public class AddRecipe(ITelegramBotClient botClient)
         if (context.InUserAccount())
         {
             context.State = (int)AddingRecipeContext.AddingName;
-
-            await botClient.SendTextMessageAsync(chatId, $"Сначала скажи мне название рецепта");
         }
         else
         {

@@ -3,11 +3,10 @@ using EasyTgBot;
 using EasyTgBot.Abstract;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 
-public class AddingInstruction(IContextRepository contextRepository, ITelegramBotClient botClient)
+public class AddingInstruction(ITelegramBotClient botClient)
     : ContextHandler<RecipePayload, AddingRecipeContext>
 {
     protected override async Task Handle(Update update,
@@ -18,17 +17,12 @@ public class AddingInstruction(IContextRepository contextRepository, ITelegramBo
         {
             payload = payload with { Instruction = request.Value };
             context.UpdatePayload(payload).State.Continue();
-            
-            await botClient.SendTextMessageAsync(request.GetChatId(), "Готово", replyMarkup: GetSaveButton());
         }
     }
 
-    private static ReplyKeyboardMarkup GetSaveButton()
+    protected override async Task Enter(DetailContext<RecipePayload, AddingRecipeContext> context)
     {
-        return new ReplyKeyboardMarkup
-        ([
-            ["Сохранить"]
-        ]);
+        await botClient.SendTextMessageAsync(context.ChatId, "Теперь напиши инструкцию");
     }
 }
 // а норм ли что инфу про следующие иструкцию даёт прошошлая. не слишком ли появляетяс зависимость.

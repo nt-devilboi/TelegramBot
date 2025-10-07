@@ -20,4 +20,13 @@ public class EditInstruction(IRecipeRepository recipeRepository, ITelegramBotCli
         await botClient.SendTextMessageAsync(context.ChatId, "Инструкцию изменил");
         context.Reset();
     }
+
+    protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
+    {
+        if (!context.TryGetPayload(out var payload)) return;
+        var recipe = await recipeRepository.Get(payload.NameRecipe);
+        await botClient.SendTextMessageAsync(context.ChatId, "Хорошо давай изменим инструкцию \n сейчас она такая");
+        await botClient.SendTextMessageAsync(context.ChatId, recipe!.Instruction);
+        await botClient.SendTextMessageAsync(context.ChatId, "Напиши новую версию");
+    }
 }

@@ -47,26 +47,13 @@ public class WantToCook(
         }
 
 
-        await botClient.SendTextMessageAsync(textRequest.GetChatId(), Phrase.WantToCook.WhatDoYouWant,
-            replyMarkup: new ReplyKeyboardMarkup(
-                GetButtons(recipes)));
+        
 
         context.State = (int)CookContext.ChoosingDish;
     }
 
-    private IEnumerable<KeyboardButton> GetButtons(IReadOnlyList<Recipe> recipes)
-    {
-        foreach (var recipe in recipes)
-        {
-            var date = recipe.WasCookedLastTime?.ToString("dd MMMM yyyy года", CultureInfo.GetCultureInfo("ru-RU"));
-            var stringData = date != null ? $"Готовилось {date}" : "Не готовил";
-            yield return new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}. {stringData}");
-        }
-    }
+    
 
 
-    private string ToUpperFirst(string str)
-    {
-        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str);
-    }
+    
 }

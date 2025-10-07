@@ -1,6 +1,8 @@
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
+using EasyTgBot.Entity;
+using Polly;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -16,9 +18,9 @@ public class AddingIngredients(ITelegramBotClient botClient)
         var request = update.AsRequestWithText();
 
 
-        if (request.Value == "Закончить") // если уж мы базарим про разные middleware, то можно сделать middleware, который берёт ответственность за переход на слеюудщий этап контекста.
+        if (request.Value ==
+            "Закончить") // если уж мы базарим про разные middleware, то можно сделать middleware, который берёт ответственность за переход на слеюудщий этап контекста.
         {
-            await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь напиши инструкцию");
             context.State.Continue();
             return;
         }
@@ -27,7 +29,8 @@ public class AddingIngredients(ITelegramBotClient botClient)
 
         if (!parsedText.isValid)
         {
-            await botClient.SendTextMessageAsync(context.ChatId, "Я так не понимаю. Напиши пожалуйста в таком стиле: \"яйца 3 штуки\"");
+            await botClient.SendTextMessageAsync(context.ChatId,
+                "Я так не понимаю. Напиши пожалуйста в таком стиле: \"яйца 3 штуки\"");
             return;
         }
 
@@ -43,6 +46,12 @@ public class AddingIngredients(ITelegramBotClient botClient)
             ([
                 ["Закончить"]
             ]));
+    }
+
+    protected override async Task Enter(DetailContext<RecipePayload, AddingRecipeContext> context)
+    {
+        await botClient.SendTextMessageAsync(context.ChatId,
+            "Теперь давай добавим ингредиенты.\n Пиши по одному ингредиенту");
     }
 
 

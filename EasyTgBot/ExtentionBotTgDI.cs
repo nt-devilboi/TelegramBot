@@ -18,7 +18,7 @@ public static class ExtensionBotTgDi
         client.SetWebhookAsync(webhook).Wait();
         serviceCollection.AddSingleton<ITelegramBotClient>(client);
         serviceCollection.AddScoped<IUpdateProcess, UpdateProcess>();
-        serviceCollection.AddScoped<IMessageHandler, MessageHandler>();
+        serviceCollection.AddScoped<MessageHandler>();
         serviceCollection.AddScoped<IContextFactory, ContextFactory>();
     }
 

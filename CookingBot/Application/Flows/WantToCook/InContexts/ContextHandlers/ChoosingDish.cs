@@ -1,11 +1,10 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
-using CookingBot.Application.Commands;
-using CookingBot.Application.Flows.ExtentsionCook;
 using CookingBot.Application.Interfaces;
+using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -20,6 +19,8 @@ public partial class ChoosingDish(
     [GeneratedRegex(@"^.+(?=\. )")]
     private static partial Regex TakeNameDish();
 
+    private static string WhatDoYouWantToCook = "Что хочешь приготовить?";
+
     protected override async Task Handle(Update update, DetailContext<CookPayload, CookContext> context)
     {
         var request = update.AsRequestWithText();
@@ -33,15 +34,31 @@ public partial class ChoosingDish(
 
         var cook = new CookPayload(recipe.nameRecipe);
         context.UpdatePayload(cook);
-        await botClient.SendTextMessageAsync(request.GetChatId(), $"Вот что нужно для блюда:");
-        await botClient.SendTextMessageAsync(request.GetChatId(), recipe.GetIngredientsList());
-        await botClient.SendTextMessageAsync(request.GetChatId(), $"Инструкция:\n {recipe.Instruction}");
-        await botClient.SendTextMessageAsync(request.GetChatId(), "Скажешь как приготовишь",
-            replyMarkup: new ReplyKeyboardMarkup
-            ([
-                [Phrase.WantToCook.ICooked]
-            ]));
 
         context.State.Continue();
+    }
+
+    protected override async Task Enter(DetailContext<CookPayload, CookContext> context)
+    {
+        var recipes = await recipeRepository.Get(context.ChatId);
+        await botClient.SendTextMessageAsync(context.ChatId, WhatDoYouWantToCook,
+            replyMarkup: new ReplyKeyboardMarkup(
+                GetButtons(recipes)));
+    }
+
+
+    private IEnumerable<KeyboardButton> GetButtons(IReadOnlyList<Recipe> recipes)
+    {
+        foreach (var recipe in recipes)
+        {
+            var date = recipe.WasCookedLastTime?.ToString("dd MMMM yyyy года", CultureInfo.GetCultureInfo("ru-RU"));
+            var stringData = date != null ? $"Готовилось {date}" : "Не готовил";
+            yield return new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}. {stringData}");
+        }
+    }
+
+    private string ToUpperFirst(string str)
+    {
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str);
     }
 }
