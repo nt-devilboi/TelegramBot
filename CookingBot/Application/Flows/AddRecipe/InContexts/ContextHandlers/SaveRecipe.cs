@@ -42,12 +42,19 @@ public class SaveRecipe(
         await recipeRepository.Upsert(recipe);
 
 
-        await botClient.SendTextMessageAsync(request.GetChatId(), Phrase.Recipe.Save);
-        await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь можешь выполнить эти команды",
-            replyMarkup: new ReplyKeyboardMarkup([
-                CheckMyRecipe.staticTrigger,
-                WantToCook.WantToCook.StaticTrigger
-            ]));
+        await botClient.SendTextMessageAsync(request.GetChatId(), "Сохранил!");
         context.Reset();
+    }
+
+    protected override async Task Enter(DetailContext<RecipePayload, AddingRecipeContext> context)
+    {
+        await botClient.SendTextMessageAsync(context.ChatId, "Готово", replyMarkup: GetSaveButton());
+    }
+
+    private static ReplyKeyboardMarkup GetSaveButton()
+    {
+        return new ReplyKeyboardMarkup([
+            ["Сохранить"]
+        ]);
     }
 }

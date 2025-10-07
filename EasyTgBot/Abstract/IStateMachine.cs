@@ -8,7 +8,7 @@ public interface IStateMachine<in TState>
     void GoTo(TState state);
 }
 
-public class StateMachine<TState>(StateMachine<TState, Trigger> stateMachine) : IStateMachine<TState>
+internal class StateMachine<TState>(StateMachine<TState, Trigger> stateMachine) : IStateMachine<TState> where TState : Enum 
 {
     private readonly StateMachine<TState, Trigger>.TriggerWithParameters<string> _goToSubTask =
         new(Trigger.UserGoToSubTask);

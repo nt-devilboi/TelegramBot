@@ -9,10 +9,11 @@ public interface IUpdateProcess
     public Task Update(Update update);
 }
 
-public class UpdateProcess(
+internal class UpdateProcess(
     ITelegramBotClient telegramBotClient,
-    IMessageHandler messageHandler,
-    IContextRepository contextRepository)
+    MessageHandler messageHandler,
+    IContextRepository contextRepository,
+    IContextFactory contextFactory)
     : IUpdateProcess
 {
     public async Task Update(Update update)
@@ -20,7 +21,7 @@ public class UpdateProcess(
         if (update.Message?.Text != null)
         {
             var context = await contextRepository.Get(update.Message.Chat.Id) ?? NotAuthorized();
-            await messageHandler.Handle(update.AsRequestWithText(), context);
+            await messageHandler.Handle(update, context, contextFactory);
         }
         else
         {

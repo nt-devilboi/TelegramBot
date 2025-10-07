@@ -1,4 +1,5 @@
 using EasyTgBot.Abstract;
+using EasyTgBot.BuilderContext;
 using Microsoft.Extensions.DependencyInjection;
 using Stateless;
 

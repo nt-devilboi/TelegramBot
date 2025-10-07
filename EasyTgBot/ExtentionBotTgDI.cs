@@ -9,8 +9,9 @@ namespace EasyTgBot;
 
 public static class ExtensionBotTgDi
 {
-    public static void AddTelegramBotWithController(this IServiceCollection serviceCollection, string host,
-        string token)
+    public static void AddTelegramBotWithController<TMainMenuHandler>(this IServiceCollection serviceCollection,
+        string host,
+        string token) where TMainMenuHandler : class, IStrategyOnMenu
     {
         serviceCollection.AddMvc().AddApplicationPart(Assembly.GetAssembly(typeof(BotController)));
         var client = new TelegramBotClient(token);
@@ -18,7 +19,8 @@ public static class ExtensionBotTgDi
         client.SetWebhookAsync(webhook).Wait();
         serviceCollection.AddSingleton<ITelegramBotClient>(client);
         serviceCollection.AddScoped<IUpdateProcess, UpdateProcess>();
-        serviceCollection.AddScoped<IMessageHandler, MessageHandler>();
+        serviceCollection.AddScoped<MessageHandler>();
+        serviceCollection.AddScoped<IStrategyOnMenu, TMainMenuHandler>();
         serviceCollection.AddScoped<IContextFactory, ContextFactory>();
     }
 

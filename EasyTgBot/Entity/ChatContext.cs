@@ -12,7 +12,7 @@ public class ChatContext
     {
         return new ChatContext
         {
-            State = (int)BaseContextState.UserAccount,
+            State = (int)BaseContextState.UserMenu,
             Id = Guid.NewGuid(),
             ChatId = chatId
         };
@@ -22,5 +22,5 @@ public class ChatContext
 internal enum BaseContextState
 {
     Public,
-    UserAccount
+    UserMenu
 }

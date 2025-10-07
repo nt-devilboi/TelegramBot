@@ -1,8 +1,7 @@
 using EasyTgBot.Abstract;
-using EasyTgBot.BuilderContext;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EasyTgBot;
+namespace EasyTgBot.BuilderContext;
 
 public class BuilderContextFlow<TState>
 {

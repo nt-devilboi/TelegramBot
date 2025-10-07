@@ -50,8 +50,8 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 // easyTg
 
 builder.Services.AddTelegramCommands();
-builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://ea1d11f5944ed6.lhr.life",
+builder.Services.AddTelegramBotWithController<MainMenuHandler>(
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://746bc681579e40.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
@@ -61,7 +61,7 @@ builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
 builder.Services.AddContext<AddingRecipeContext>(x => x
-    .AddHandler<RecipeSetName>()
+    .AddHandler<AddingName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()
     .AddHandler<SaveRecipe>(), registerFlow);
@@ -71,7 +71,7 @@ builder.Services.AddContext<CookContext>(x => x
     .AddHandler<Cooking>(), registerFlow);
 
 builder.Services.AddContext<EditContext>(x =>
-        x.AddHandler<ChooseEditItem>()
+        x.AddHandler<ChooseEditRecipe>()
             .AddHandler<SwitchEditItem>(x =>
                 x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>().AddSubHandler<EditIngredients>()),
     registerFlow);

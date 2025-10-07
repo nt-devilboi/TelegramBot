@@ -1,6 +1,8 @@
+using CookingBot.Application.Flows.ExtentsionCook;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Payloads;
 using EasyTgBot.Abstract;
+using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -50,9 +52,18 @@ public class EditIngredients(IRecipeRepository recipeRepository, ITelegramBotCli
             await botClient.SendTextMessageAsync(context.ChatId, "Такой ингредиент уже есть");
         }
     }
+
+    protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
+    {
+        if (!context.TryGetPayload(out var payload)) return;
+        var recipe = await recipeRepository.Get(payload.NameRecipe);
+        await botClient.SendTextMessageAsync(context.ChatId, "Хорошо давай изменим ингредиенты \n сейчас они такие:");
+        await botClient.SendTextMessageAsync(context.ChatId, recipe!.GetIngredientsList());
+        await botClient.SendTextMessageAsync(context.ChatId, "что хочешь, чтоб я добавил или удалил");
+    }
 }
 
-public static class StringExtension
+public static class StringExtension //todo прикол, который следует потом убрать.
 {
     public static void Deconstruct(this string s, out string command, out string name, out bool valid)
     {
