@@ -43,11 +43,6 @@ public class SaveRecipe(
 
 
         await botClient.SendTextMessageAsync(request.GetChatId(), "Сохранил!");
-        await botClient.SendTextMessageAsync(request.GetChatId(), "Теперь можешь выполнить эти команды",
-            replyMarkup: new ReplyKeyboardMarkup([
-                CheckMyRecipe.staticTrigger,
-                WantToCook.WantToCook.StaticTrigger
-            ]));
         context.Reset();
     }
 

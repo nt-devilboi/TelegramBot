@@ -50,8 +50,8 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 // easyTg
 
 builder.Services.AddTelegramCommands();
-builder.Services.AddTelegramBotWithController(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://dacfd45e704418.lhr.life",
+builder.Services.AddTelegramBotWithController<MainMenuHandler>(
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://746bc681579e40.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
