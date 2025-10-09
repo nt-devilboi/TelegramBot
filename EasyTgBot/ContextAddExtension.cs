@@ -10,11 +10,8 @@ public static class ContextAddExtension
     public static void AddContext<TEnum>(this IServiceCollection serviceCollection,
         Action<BuilderContextFlow<TEnum>> builderFunc, IServiceRegistryFlow registryFlow) where TEnum : struct, Enum
     {
-        // достаём из serivceCollection
-
-        var start = (int)(object)Enum.GetValues<TEnum>().Min();
-        var end = (int)(object)Enum.GetValues<TEnum>().Max();
-        var builder = new BuilderContextFlow<TEnum>(serviceCollection, new RangeFlowComponents(start, end));
+        var enums = Enum.GetValues<TEnum>();
+        var builder = new BuilderContextFlow<TEnum>(serviceCollection, new RangeFlowComponents<TEnum>(enums));
 
         builderFunc(builder);
 
@@ -22,37 +19,18 @@ public static class ContextAddExtension
     }
 }
 
-[Obsolete] // как только
-internal static class ConfigurationStateMachine
+public class RangeFlowComponents<TState>(TState[] state)
 {
-    public static StateMachine<TState, Trigger> BaseConfiguration<TState>(
-        this StateMachine<TState, Trigger> stateMachine)
-        where TState : struct, Enum
-    {
-        var enums = Enum.GetValues<TState>();
+    private int _pointer;
+    public TState FreeState => state[_pointer];
+    public TState PrevState => state[_pointer - 1];
+    private readonly TState _start = state[0];
 
-        for (var i = 1; i < enums.Length; i++)
-        {
-            var k = stateMachine.Configure(enums[i - 1]);
-            k.Permit(Trigger.UserWantToContinue, enums[i]);
-        }
+    public bool IsStart => _pointer == 0;
+    public TState PrevHandler { get; set; }
+    public bool Empty => _pointer >= state.Length;
 
-        return stateMachine;
-    }
-}
-
-public class RangeFlowComponents(int start, int end)
-{
-    private int _cur = start;
-    private readonly int _start = start;
-
-    public bool IsStart => _start == _cur;
-    public int PrevHandler { get; set; } = start;
-
-    public bool Empty => _cur > end;
-    public int GetIdFreeComponent => _cur;
-
-    public void Next() => _cur++;
+    public void Next() => _pointer++;
 }
 
 internal record IHandlerInfo(IContextHandler ContextHandler, string number);

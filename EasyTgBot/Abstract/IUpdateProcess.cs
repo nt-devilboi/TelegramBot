@@ -34,7 +34,7 @@ internal class UpdateProcess(
     {
         return new ChatContext
         {
-            State = (int)BaseContextState.Public,
+            State = BaseContextState.Public.ToString(),
             Id = Guid.NewGuid(),
             Payload = ""
         };

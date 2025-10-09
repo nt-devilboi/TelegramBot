@@ -14,11 +14,11 @@ namespace CookingBot.Application.Flows.WantToCook;
 
 public class WantToCook(
     IRecipeRepository recipeRepository,
-    ITelegramBotClient botClient) : ICommand
+    ITelegramBotClient botClient) : Router, ICommand
 {
     public string Trigger { get; } = StaticTrigger;
     public string Desc { get; }
-    
+
     public static readonly string StaticTrigger = "Хочу приготовить";
     public Priority Priority { get; } = Priority.Command;
 
@@ -47,13 +47,6 @@ public class WantToCook(
         }
 
 
-        
-
-        context.State = (int)CookContext.ChoosingDish;
+        Route<CookContext>(context);
     }
-
-    
-
-
-    
 }

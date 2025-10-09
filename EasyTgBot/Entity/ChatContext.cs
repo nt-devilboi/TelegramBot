@@ -3,7 +3,7 @@ namespace EasyTgBot.Entity;
 public class ChatContext
 {
     public Guid Id { get; set; }
-    public int State { get; set; }
+    public string State { get; set; }
     public string? Payload { get; set; }
     public long ChatId { get; set; }
 
@@ -12,7 +12,7 @@ public class ChatContext
     {
         return new ChatContext
         {
-            State = (int)BaseContextState.UserMenu,
+            State = BaseContextState.UserMenu.ToString(),
             Id = Guid.NewGuid(),
             ChatId = chatId
         };

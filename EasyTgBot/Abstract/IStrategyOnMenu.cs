@@ -26,7 +26,7 @@ internal class MessageHandler : IContextHandler
         _strategyOnMenu = strategyOnMenu;
         _commands = commands.ToDictionary(x => x.Trigger, x => x);
         _contexts = handlerInfos.ToDictionary(x => x.number, x => x.ContextHandler);
-        _contexts.Add("1", this);
+        _contexts.Add(BaseContextState.UserMenu.ToString(), this);
     }
 
 
@@ -45,19 +45,20 @@ internal class MessageHandler : IContextHandler
             await _contextRepository.Upsert(context);
         }
 
-        if (contextHandler != null && contextHandler != this)
+        else if (contextHandler != null && contextHandler != this)
         {
             await contextHandler.Handle(update, context, contextFactory);
             await _contextRepository.Upsert(context);
         }
 
-        if (command is { Priority: Priority.Command })
+        else if (command is { Priority: Priority.Command })
         {
             await command.Execute(update, context);
             await _contextRepository.Upsert(context);
         }
 
-        if (context.State != oldState && _contexts.TryGetValue(context.State.ToString(), out contextHandler))
+        if (string.CompareOrdinal(context.State, oldState) != 0 &&
+            _contexts.TryGetValue(context.State, out contextHandler))
         {
             await contextHandler.Enter(context, contextFactory);
         }

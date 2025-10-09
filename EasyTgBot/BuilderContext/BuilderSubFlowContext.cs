@@ -5,8 +5,8 @@ namespace EasyTgBot.BuilderContext;
 
 public class BuilderSubFlowContext<TState>(
     List<StateEvent> steps,
-    RangeFlowComponents rangeFlowComponents,
-    IServiceCollection collection)
+    RangeFlowComponents<TState> rangeFlowComponents,
+    IServiceCollection collection) where TState : struct, Enum
 {
     public BuilderSubFlowContext<TState> AddSubHandler<TContextHandler>() where TContextHandler : class, IContextHandler
     {
@@ -17,10 +17,11 @@ public class BuilderSubFlowContext<TState>(
 
         collection.AddScoped<TContextHandler>();
 
-        var cur = rangeFlowComponents.GetIdFreeComponent;
+        var cur = rangeFlowComponents.FreeState;
+        var prev = rangeFlowComponents.PrevState;
         if (!rangeFlowComponents.IsStart)
         {
-            steps.Add(new StateEvent(Trigger.UserCompletedSubTask, cur - 1, cur));
+            steps.Add(new StateEvent(Trigger.UserCompletedSubTask, prev, cur));
             rangeFlowComponents.Next();
         }
 

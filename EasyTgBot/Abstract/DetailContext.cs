@@ -14,8 +14,8 @@ public class DetailContext<TPayload, TState>
 
     internal DetailContext(ChatContext chatContext, IServiceRegistryFlow registryFlow)
     {
-        var stateMachine = new StateMachine<TState, Trigger>(() => (TState)(object)chatContext.State,
-            x => chatContext.State = (int)(object)x);
+        var stateMachine = new StateMachine<TState, Trigger>(() => Enum.Parse<TState>(chatContext.State),
+            x => chatContext.State = x.ToString());
 
         State = registryFlow.Wraps(stateMachine);
         _chatContext = chatContext;

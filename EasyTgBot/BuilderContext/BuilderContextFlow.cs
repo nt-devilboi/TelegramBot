@@ -3,13 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EasyTgBot.BuilderContext;
 
-public class BuilderContextFlow<TState>
+public class BuilderContextFlow<TState> where TState : struct, Enum
 {
     private readonly IServiceCollection _collection;
-    private readonly RangeFlowComponents _rangeFreeFlowComponent;
+    private readonly RangeFlowComponents<TState> _rangeFreeFlowComponent;
     internal readonly List<StateEvent> Steps = [];
+    private readonly TState[] _state;
 
-    internal BuilderContextFlow(IServiceCollection collection, RangeFlowComponents rangeFreeFlowComponent)
+    internal BuilderContextFlow(IServiceCollection collection, RangeFlowComponents<TState> rangeFreeFlowComponent)
     {
         _collection = collection;
         _rangeFreeFlowComponent = rangeFreeFlowComponent;
@@ -24,7 +25,7 @@ public class BuilderContextFlow<TState>
 
         _collection.AddScoped<TContextHandler>();
 
-        var start = _rangeFreeFlowComponent.GetIdFreeComponent;
+        var start = _rangeFreeFlowComponent.FreeState;
 
         if (!_rangeFreeFlowComponent.IsStart)
             Steps.Add(new StateEvent(Trigger.UserWantToContinue, _rangeFreeFlowComponent.PrevHandler, start));
@@ -38,11 +39,12 @@ public class BuilderContextFlow<TState>
         {
             var subTaskBuilder = new BuilderSubFlowContext<TState>(Steps, _rangeFreeFlowComponent, _collection);
             action(subTaskBuilder);
-            var end = _rangeFreeFlowComponent.GetIdFreeComponent - 1;
+            var end = _rangeFreeFlowComponent.PrevState;
             Steps.Add(new StateEvent(Trigger.UserCompletedAllSubTask, end, start));
-            for (var i = start + 1; i <= end; i++)
+            for (var i = (int)(object)start + 1; i <= (int)(object)end; i++)
             {
-                Steps.Add(new StateEvent(Trigger.UserGoToSubTask, start, i, ((TState)(object)i).ToString()));
+                Steps.Add(new StateEvent(Trigger.UserGoToSubTask, start, (TState)(object)i,
+                    ((TState)(object)i).ToString()));
             }
         }
 

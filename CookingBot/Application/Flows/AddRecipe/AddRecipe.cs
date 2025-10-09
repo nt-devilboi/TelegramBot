@@ -1,3 +1,4 @@
+using CookingBot.Application.Commands;
 using CookingBot.Application.Flows.AddRecipe.InContexts;
 using EasyTgBot;
 using EasyTgBot.Abstract;
@@ -8,7 +9,7 @@ using Telegram.Bot.Types;
 namespace CookingBot.Application.Flows.AddRecipe;
 
 public class AddRecipe(ITelegramBotClient botClient)
-    : ICommand
+    : Router, ICommand
 {
     public string Trigger { get; } = StaticTrigger;
     public string Desc { get; }
@@ -19,14 +20,15 @@ public class AddRecipe(ITelegramBotClient botClient)
     {
         var chatId = request.Message.Chat.Id;
 
-        if (context.State == 0)
+        if (context.InPublic())
         {
             await botClient.SendTextMessageAsync(chatId, "Сначала нужно авторизоваться");
             return;
         }
+
         if (context.InUserAccount())
         {
-            context.State = (int)AddingRecipeContext.AddingName;
+            Route<AddingRecipeContext>(context);
         }
         else
         {
