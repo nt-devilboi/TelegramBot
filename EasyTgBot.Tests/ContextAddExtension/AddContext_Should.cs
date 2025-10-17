@@ -21,7 +21,7 @@ public class Tests
     public void CorrectWork_IF_UseAddHandlerAndAddSubHandle()
     {
         var serviceRegistry = collection.BuildServiceProvider().GetService<IServiceRegistryFlow>();
-        collection.AddContext<TestUserFlow>(
+        collection.AddContext<TestUserFlow>("test",
             x => x.AddHandler<FakeHandler>(x => x.AddSubHandler<FakeHandler>()
                     .AddSubHandler<FakeHandler2>())
                 .AddHandler<FakeHandler>(),

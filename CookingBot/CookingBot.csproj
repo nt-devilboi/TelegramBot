@@ -37,5 +37,10 @@
     <ItemGroup>
         <ProjectReference Include="..\EasyTgBot\EasyTgBot.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Application\Flows\Friends\InContext\" />
+      <Folder Include="Application\Services\" />
+    </ItemGroup>
     
 </Project>

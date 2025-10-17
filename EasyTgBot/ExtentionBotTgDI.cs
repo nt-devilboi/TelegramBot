@@ -1,7 +1,9 @@
 using System.Reflection;
+using System.Windows.Input;
 using EasyTgBot.Abstract;
 using EasyTgBot.controller;
 using EasyTgBot.Infrastructure;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
 
@@ -39,8 +41,8 @@ public static class ExtensionBotTgDi
         var commandsTypes = GetCommandsFrom(assembly);
         foreach (var commandsType in commandsTypes)
         {
-            serviceCollection.AddScoped<ICommand>(provider =>
-                (ICommand)ActivatorUtilities.CreateInstance(provider, commandsType));
+            serviceCollection.AddScoped<Command>(provider =>
+                (Command)ActivatorUtilities.CreateInstance(provider, commandsType));
         }
 
         return serviceCollection;
@@ -51,7 +53,9 @@ public static class ExtensionBotTgDi
     {
         return assembly
             .GetTypes()
-            .Where(t => t.GetInterface(typeof(ICommand).ToString()) != null)
+            .Where(t => t is { BaseType: not null, IsAbstract: false } &&
+                        t.BaseType == typeof(Command)
+            )
             .ToArray();
     }
 }

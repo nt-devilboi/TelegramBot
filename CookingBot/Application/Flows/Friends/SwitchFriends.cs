@@ -5,7 +5,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.Friends;
 
-public class Friends(ITelegramBotClient botClient) : ContextHandler<BasePayload, FriendsContext>
+public class SwitchFriends(ITelegramBotClient botClient) : ContextHandler<BasePayload, FriendsContext>
 {
     private (string AddFriend, string CheckOutFriendCooking) buttoms = ("Добавить друга",
         "Посмотреть, что готовил друг");

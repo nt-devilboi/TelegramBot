@@ -3,12 +3,11 @@ using Telegram.Bot.Types;
 
 namespace EasyTgBot.Abstract;
 
-public interface ICommand : IHandler
+public abstract class Command : IHandler
 {
-    public string Trigger { get; }
-
-    public string Desc { get; }
-    public Priority Priority { get; }
+    public abstract string Trigger { get; }
+    public virtual Priority Priority { get; } = Priority.Command;
+    public abstract Task Execute(Update update, ChatContext context);
 }
 
 public enum Priority
@@ -19,6 +18,5 @@ public enum Priority
 
 public interface IHandler
 {
-    public Priority Priority { get; }
     public Task Execute(Update update, ChatContext context);
 }

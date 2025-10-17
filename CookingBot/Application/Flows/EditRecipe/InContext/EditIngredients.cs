@@ -15,21 +15,15 @@ public class EditIngredients(IRecipeRepository recipeRepository, ITelegramBotCli
 
     protected override async Task Handle(Update update, DetailContext<ChoseRecipePayload, EditContext> context)
     {
-        var (command, ingredient, isValid) = update.Message.Text;
-
-        if (!isValid)
-        {
-            await botClient.SendTextMessageAsync(context.ChatId, "например, Напиши Удали\\добавь  сыр");
-            return;
-        }
+        var (opcode, data) = Parse(update.Message.Text);
 
         if (!context.TryGetPayload(out var payload)) return;
         var recipe = (await recipeRepository.Get(payload.NameRecipe))!;
 
 
-        if (string.Compare(command, Commands.delete, StringComparison.OrdinalIgnoreCase) == 0)
+        if (string.Compare(opcode, Commands.delete, StringComparison.OrdinalIgnoreCase) == 0)
         {
-            if (recipe.Ingredients.Remove(ingredient))
+            if (recipe.Ingredients.Remove(data))
             {
                 await recipeRepository.Upsert(recipe);
                 await botClient.SendTextMessageAsync(context.ChatId, "Удалил");
@@ -40,9 +34,18 @@ public class EditIngredients(IRecipeRepository recipeRepository, ITelegramBotCli
             return;
         }
 
-        if (string.Compare(command, Commands.add, StringComparison.OrdinalIgnoreCase) == 0)
+        if (string.Compare(opcode, Commands.add, StringComparison.OrdinalIgnoreCase) == 0)
         {
-            if (recipe.Ingredients.TryAdd(ingredient, new IngredientDetail(0, "штук")))
+            var ingredient = data.AsIngredient();
+            if (!ingredient.isValid)
+            {
+                await botClient.SendTextMessageAsync(context.ChatId, "Я понимаю только так: \"добавь сыр 300 грамм\"");
+                return;
+            }
+
+
+            if (recipe.Ingredients.TryAdd(ingredient.name,
+                    new IngredientDetail(ingredient.unit, ingredient.measurement)))
             {
                 await recipeRepository.Upsert(recipe);
                 await botClient.SendTextMessageAsync(context.ChatId, "Добавил");
@@ -51,6 +54,17 @@ public class EditIngredients(IRecipeRepository recipeRepository, ITelegramBotCli
 
             await botClient.SendTextMessageAsync(context.ChatId, "Такой ингредиент уже есть");
         }
+
+        else
+        {
+            await botClient.SendTextMessageAsync(context.ChatId, "Например, Напиши Удали\\добавь сыр");
+        }
+    }
+
+    private (string opcode, string data) Parse(string s)
+    {
+        var result = s.Split(" ");
+        return (result[0], string.Join(" ", result[1..]));
     }
 
     protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
@@ -60,30 +74,5 @@ public class EditIngredients(IRecipeRepository recipeRepository, ITelegramBotCli
         await botClient.SendTextMessageAsync(context.ChatId, "Хорошо давай изменим ингредиенты \n сейчас они такие:");
         await botClient.SendTextMessageAsync(context.ChatId, recipe!.GetIngredientsList());
         await botClient.SendTextMessageAsync(context.ChatId, "что хочешь, чтоб я добавил или удалил");
-    }
-}
-
-public static class StringExtension //todo прикол, который следует потом убрать.
-{
-    public static void Deconstruct(this string s, out string command, out string name, out bool valid)
-    {
-        var parsedString = s.Split();
-        if (parsedString.Length != 2 || string.IsNullOrEmpty(parsedString[0]) || string.IsNullOrEmpty(parsedString[1]))
-        {
-            command = null;
-            name = null;
-            valid = false;
-            return;
-        }
-
-        valid = true;
-        command = parsedString[0];
-        name = parsedString[1];
-    }
-
-    public static void Deconstruct(this string s, out string command)
-    {
-        var parsedString = s.Split();
-        command = parsedString[0];
     }
 }

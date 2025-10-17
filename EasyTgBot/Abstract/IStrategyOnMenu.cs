@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -13,11 +14,11 @@ internal class MessageHandler : IContextHandler
 {
     private readonly ITelegramBotClient _botClient;
     private readonly IContextRepository _contextRepository;
-    private readonly Dictionary<string, ICommand> _commands;
+    private readonly Dictionary<string, Command> _commands;
     private readonly Dictionary<string, IContextHandler> _contexts;
     private readonly IStrategyOnMenu _strategyOnMenu;
 
-    public MessageHandler(IEnumerable<ICommand> commands, IEnumerable<IHandlerInfo> handlerInfos,
+    public MessageHandler(IEnumerable<Command> commands, IEnumerable<IHandlerInfo> handlerInfos,
         ITelegramBotClient botClient, IContextRepository contextRepository,
         IStrategyOnMenu strategyOnMenu)
     {
@@ -55,6 +56,10 @@ internal class MessageHandler : IContextHandler
         {
             await command.Execute(update, context);
             await _contextRepository.Upsert(context);
+        }
+        else
+        {
+            await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "Я ваще ничего не понял"); // сделать изменить
         }
 
         if (string.CompareOrdinal(context.State, oldState) != 0 &&

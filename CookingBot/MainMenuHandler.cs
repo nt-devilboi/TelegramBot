@@ -28,6 +28,6 @@ public class MainMenuHandler(IRecipeRepository repository, ITelegramBotClient bo
 
     private IReplyMarkup GetAvailableCommand()
     {
-        return new ReplyKeyboardMarkup([WantToCook.StaticTrigger, AddRecipe.StaticTrigger, EditRecipe.StaticTrigger]);
+        return new ReplyKeyboardMarkup([WantToCook.StaticTrigger, AddRecipe.StaticTrigger, "Редактировать рецепт"]); //todo: малось здесь кринже.
     }
 }
