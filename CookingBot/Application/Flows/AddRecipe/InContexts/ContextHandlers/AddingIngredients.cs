@@ -1,3 +1,4 @@
+using CookingBot.Application.Flows.ExtentsionCook;
 using CookingBot.Domain.Payloads;
 using EasyTgBot;
 using EasyTgBot.Abstract;
@@ -25,7 +26,7 @@ public class AddingIngredients(ITelegramBotClient botClient)
             return;
         }
 
-        var parsedText = Parse(request.Value);
+        var parsedText = request.Value.AsIngredient();
 
         if (!parsedText.isValid)
         {
@@ -64,17 +65,5 @@ public class AddingIngredients(ITelegramBotClient botClient)
 
         context.UpdatePayload(payload);
         return true;
-    }
-
-    private (string name, uint unit, string measurement, bool isValid) Parse(string text)
-    {
-        var data = text.Split(" ", 3);
-        if (data.Length != 3 || !uint.TryParse(data[1], out var unit))
-        {
-            return (default, default, default, false)!;
-        }
-
-
-        return (data[0], unit, data[2], true);
     }
 }

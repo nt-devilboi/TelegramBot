@@ -12,17 +12,17 @@ using Update = Telegram.Bot.Types.Update;
 namespace CookingBot.Application.Commands;
 
 public class OAuthGoogle(IOAuthClient authClient, ILog log, ITelegramBotClient botClient)
-    : ICommand
+    : Command
 {
     private readonly string _text = "Google";
     public static readonly string StaticTrigger = "Авторизоваться";
 
-    public string Trigger { get; } = StaticTrigger;
+    public override string Trigger { get; } = StaticTrigger;
     public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал кто ты";
 
     public Priority Priority { get; } = Priority.Command;
 
-    public async Task Execute(Update update, ChatContext context = null)
+    public override async Task Execute(Update update, ChatContext context = null)
     {
         var chatId = update.Message.Chat.Id;
 

@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Commands;
 
-public class CheckMyRecipe(IRecipeRepository recipeRepository, ITelegramBotClient botClient) : ICommand
+public class CheckMyRecipe(IRecipeRepository recipeRepository, ITelegramBotClient botClient) : IHandler
 {
     public string Trigger { get; } = staticTrigger;
     public static string staticTrigger = "Покажи рецепт";

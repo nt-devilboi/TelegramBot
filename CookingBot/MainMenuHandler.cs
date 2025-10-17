@@ -16,12 +16,18 @@ public class MainMenuHandler(IRecipeRepository repository, ITelegramBotClient bo
         var recipe = await repository.Get(context.ChatId);
         if (recipe.Count != 0)
         {
-            await botClient.SendTextMessageAsync(context.ChatId, "Можешь выполнять эти команды", replyMarkup: GetAvailableCommand());
+            await botClient.SendTextMessageAsync(context.ChatId, "Можешь выполнять эти команды",
+                replyMarkup: GetAvailableCommand());
+        }
+        else
+        {
+            await botClient.SendTextMessageAsync(context.ChatId, "Добавь рецепт",
+                replyMarkup: new ReplyKeyboardMarkup(AddRecipe.StaticTrigger));
         }
     }
 
     private IReplyMarkup GetAvailableCommand()
     {
-        return new ReplyKeyboardMarkup([WantToCook.StaticTrigger, AddRecipe.StaticTrigger, EditRecipe.StaticTrigger]);
+        return new ReplyKeyboardMarkup([WantToCook.StaticTrigger, AddRecipe.StaticTrigger, "Редактировать рецепт"]); //todo: малось здесь кринже.
     }
 }

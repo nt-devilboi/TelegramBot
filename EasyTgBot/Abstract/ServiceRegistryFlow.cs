@@ -25,20 +25,19 @@ public class ServiceRegistryFlow : IServiceRegistryFlow // мб в будуще�
         var approveTrigger = stateMachine.SetTriggerParameters<string>(Trigger.UserGoToSubTask);
         foreach (var stateEvent in Flows[typeof(TState)])
         {
-            var stateConfiguration = stateMachine.Configure((TState)(object)stateEvent.Source);
+            var stateConfiguration = stateMachine.Configure((TState)stateEvent.Source);
             if (stateEvent.Trigger == Trigger.UserCompletedSubTask)
             {
-                stateMachine.Configure((TState)(object)stateEvent.Dest).SubstateOf((TState)(object)stateEvent.Source);
+                stateMachine.Configure((TState)stateEvent.Dest).SubstateOf((TState)stateEvent.Source);
             }
 
             if (stateEvent.Trigger == Trigger.UserGoToSubTask)
             {
-                stateConfiguration.PermitIf(approveTrigger, (TState)(object)stateEvent.Dest,
-                    x => stateEvent.NameHandler == x);
+                stateConfiguration.PermitIf(approveTrigger, (TState)stateEvent.Dest, x => stateEvent.NameHandler == x);
                 continue;
             }
 
-            stateConfiguration.Permit(stateEvent.Trigger, (TState)(object)stateEvent.Dest);
+            stateConfiguration.Permit(stateEvent.Trigger, (TState)stateEvent.Dest);
         }
 
 
@@ -46,4 +45,4 @@ public class ServiceRegistryFlow : IServiceRegistryFlow // мб в будуще�
     }
 }
 
-public record StateEvent(Trigger Trigger, int Source, int Dest, string? NameHandler = null);
+public record StateEvent(Trigger Trigger, Enum Source, Enum Dest, string? NameHandler = null);

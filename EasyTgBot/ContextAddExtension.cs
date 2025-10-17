@@ -1,58 +1,58 @@
 using EasyTgBot.Abstract;
 using EasyTgBot.BuilderContext;
 using Microsoft.Extensions.DependencyInjection;
-using Stateless;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EasyTgBot;
 
 public static class ContextAddExtension
 {
-    public static void AddContext<TEnum>(this IServiceCollection serviceCollection,
+    public static void AddContext<TEnum>(this IServiceCollection serviceCollection, string trigger,
         Action<BuilderContextFlow<TEnum>> builderFunc, IServiceRegistryFlow registryFlow) where TEnum : struct, Enum
     {
-        // достаём из serivceCollection
+        var enums = Enum.GetValues<TEnum>();
+        var builder = new BuilderContextFlow<TEnum>(serviceCollection, new RangeFlowComponents<TEnum>(enums));
 
-        var start = (int)(object)Enum.GetValues<TEnum>().Min();
-        var end = (int)(object)Enum.GetValues<TEnum>().Max();
-        var builder = new BuilderContextFlow<TEnum>(serviceCollection, new RangeFlowComponents(start, end));
-
+        serviceCollection.AddScoped<Command>(_ => new Router<TEnum>(trigger));
+        var stateType = typeof(TEnum);
+        var duplicate = serviceCollection.Any(SameContext<TEnum>(trigger));
+        if (duplicate)
+            throw new InvalidOperationException(
+                $"Trigger descriptor for state '{stateType.FullName}' already registered.");
+        
+        serviceCollection.AddSingleton<IRouterTriggerDescriptor>(new RouterTriggerDescriptor(stateType, trigger));
         builderFunc(builder);
 
         registryFlow.AddFlow<TEnum>(builder.Steps);
     }
-}
 
-[Obsolete] // как только
-internal static class ConfigurationStateMachine
-{
-    public static StateMachine<TState, Trigger> BaseConfiguration<TState>(
-        this StateMachine<TState, Trigger> stateMachine)
-        where TState : struct, Enum
+    private static Func<ServiceDescriptor, bool> SameContext<TEnum>(string trigger) where TEnum : struct, Enum
     {
-        var enums = Enum.GetValues<TState>();
+        return d => d.ServiceType == typeof(IRouterTriggerDescriptor)
+                    && d.ImplementationInstance is RouterTriggerDescriptor r
+                    && (r.StateType == typeof(Enum) || r.Trigger == trigger);
+    }
 
-        for (var i = 1; i < enums.Length; i++)
-        {
-            var k = stateMachine.Configure(enums[i - 1]);
-            k.Permit(Trigger.UserWantToContinue, enums[i]);
-        }
-
-        return stateMachine;
+    public static IServiceCollection AddTriggerProvider(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSingleton<ITriggerProvider, TriggerProvider>();
+        return serviceCollection;
     }
 }
 
-public class RangeFlowComponents(int start, int end)
+public class RangeFlowComponents<TState>(TState[] state)
 {
-    private int _cur = start;
-    private readonly int _start = start;
+    private int _pointer;
+    public TState FreeState => state[_pointer];
+    public TState PrevState => state[_pointer - 1];
+    private readonly TState _start = state[0];
 
-    public bool IsStart => _start == _cur;
-    public int PrevHandler { get; set; } = start;
+    public bool IsStart => _pointer == 0;
+    public TState PrevHandler { get; set; } = state[0];
+    public bool Empty => _pointer >= state.Length;
 
-    public bool Empty => _cur > end;
-    public int GetIdFreeComponent => _cur;
-
-    public void Next() => _cur++;
+    public void Next() => _pointer++;
 }
 
 internal record IHandlerInfo(IContextHandler ContextHandler, string number);

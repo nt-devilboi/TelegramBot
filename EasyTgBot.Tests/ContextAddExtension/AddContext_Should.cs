@@ -1,12 +1,10 @@
 using EasyTgBot.Abstract;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Stateless;
-using Stateless.Graph;
 using Telegram.Bot.Types;
 
-namespace EasyTgBot.Tests;
+namespace EasyTgBot.Tests.ContextAddExtension;
 
 public class Tests
 {
@@ -23,7 +21,7 @@ public class Tests
     public void CorrectWork_IF_UseAddHandlerAndAddSubHandle()
     {
         var serviceRegistry = collection.BuildServiceProvider().GetService<IServiceRegistryFlow>();
-        collection.AddContext<TestUserFlow>(
+        collection.AddContext<TestUserFlow>("test",
             x => x.AddHandler<FakeHandler>(x => x.AddSubHandler<FakeHandler>()
                     .AddSubHandler<FakeHandler2>())
                 .AddHandler<FakeHandler>(),
@@ -71,6 +69,11 @@ public class FakeHandler : ContextHandler<BasePayload, TestUserFlow>
     {
         context.State.Continue();
     }
+
+    protected override Task Enter(DetailContext<BasePayload, TestUserFlow> context)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class FakeHandler2 : ContextHandler<BasePayload, TestUserFlow>
@@ -78,5 +81,10 @@ public class FakeHandler2 : ContextHandler<BasePayload, TestUserFlow>
     protected override async Task Handle(Update update, DetailContext<BasePayload, TestUserFlow> context)
     {
         context.State.Continue();
+    }
+
+    protected override Task Enter(DetailContext<BasePayload, TestUserFlow> context)
+    {
+        throw new NotImplementedException();
     }
 }

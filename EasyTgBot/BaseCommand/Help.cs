@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 
 namespace EasyTgBot.BaseCommand;
 
-public class Help(List<InfoCommand> infoCommands, ITelegramBotClient botClient) : ICommand
+public class Help(List<InfoCommand> infoCommands, ITelegramBotClient botClient) : IHandler
 {
     public string Trigger { get; } = "Что ты можешь";
     public string Desc { get; } = "Get All Commands";

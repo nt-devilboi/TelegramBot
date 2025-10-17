@@ -3,25 +3,22 @@ using EasyTgBot.Abstract;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Commands;
 
-public class Exit(IContextRepository contextRepository, ITelegramBotClient botClient) : ICommand
+public class Exit(IContextRepository contextRepository, ITelegramBotClient botClient) : Command
 {
-    public string Trigger { get; } = "Выйти";
+    public override string Trigger { get; } = "Выйти";
     public string Desc { get; }
-    public Priority Priority { get; } = Priority.SystemCommand;
+    public override Priority Priority { get; } = Priority.SystemCommand;
 
-
-    public async Task Execute(Update update, ChatContext context = null)
+    public override async Task Execute(Update update, ChatContext context = null)
     {
         if (context.InUserAccount())
         {
             await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Ты уже в главном меню");
             return;
         }
-
 
         context.Payload = null;
         context.ToUserAccount();
