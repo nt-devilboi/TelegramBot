@@ -22,8 +22,8 @@ public class Tests
     {
         var serviceRegistry = collection.BuildServiceProvider().GetService<IServiceRegistryFlow>();
         collection.AddContext<TestUserFlow>("test",
-            x => x.AddHandler<FakeHandler>(x => x.AddSubHandler<FakeHandler>()
-                    .AddSubHandler<FakeHandler2>())
+            x => x.AddHandler<FakeHandler>(x => x.AddHandler<FakeHandler>()
+                    .AddHandler<FakeHandler2>())
                 .AddHandler<FakeHandler>(),
             serviceRegistry);
 
@@ -59,6 +59,41 @@ public class Tests
         stateMachine.Fire(Trigger.UserCompletedAllSubTask);
 
         stateMachine.Fire(Trigger.UserWantToContinue);
+        stateMachine.State.Should().Be(TestUserFlow.AddName);
+    }
+
+    [Test]
+    public void CorrectWork_IF_UseAddHandler()
+    {
+        var serviceRegistry = collection.BuildServiceProvider().GetService<IServiceRegistryFlow>();
+        collection.AddContext<TestUserFlow>("test",
+            x => x.AddHandler<FakeHandler>()
+                .AddHandler<FakeHandler2>()
+                .AddHandler<FakeHandler2>()
+                .AddHandler<FakeHandler>(),
+            serviceRegistry);
+
+        var stateMachine = new StateMachine<TestUserFlow, Trigger>(TestUserFlow.Authorization);
+        serviceRegistry.Wraps(stateMachine);
+
+        var enums = Enum.GetValues<TestUserFlow>();
+        var states = stateMachine.GetInfo().States.ToArray();
+        enums.Length.Should().Be(states.Length);
+        for (var i = 0; i < enums.Length; i++)
+        {
+            states[i].UnderlyingState.Should().Be(enums[i]);
+        }
+
+
+        stateMachine.State.Should().Be(TestUserFlow.Authorization);
+        stateMachine.Fire(Trigger.UserWantToContinue);
+
+        stateMachine.State.Should().Be(TestUserFlow.AddSecondName);
+        stateMachine.Fire(Trigger.UserWantToContinue);
+
+        stateMachine.State.Should().Be(TestUserFlow.AddOld);
+        stateMachine.Fire(Trigger.UserWantToContinue);
+        
         stateMachine.State.Should().Be(TestUserFlow.AddName);
     }
 }

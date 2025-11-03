@@ -6,6 +6,7 @@ using EasyTgBot.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 
 namespace EasyTgBot;
 
@@ -18,12 +19,13 @@ public static class ExtensionBotTgDi
         serviceCollection.AddMvc().AddApplicationPart(Assembly.GetAssembly(typeof(BotController)));
         var client = new TelegramBotClient(token);
         var webhook = $"{host}/api/message/update";
-        client.SetWebhookAsync(webhook).Wait();
+        client.SetWebhookAsync(webhook, allowedUpdates: [UpdateType.Message, UpdateType.CallbackQuery, UpdateType.InlineQuery]).Wait();
         serviceCollection.AddSingleton<ITelegramBotClient>(client);
         serviceCollection.AddScoped<IUpdateProcess, UpdateProcess>();
         serviceCollection.AddScoped<MessageHandler>();
         serviceCollection.AddScoped<IStrategyOnMenu, TMainMenuHandler>();
         serviceCollection.AddScoped<IContextFactory, ContextFactory>();
+        serviceCollection.AddScoped<ITriggerProvider, TriggerProvider>();
     }
 
     public static void AddTelegramDbContext<TDb>(this IServiceCollection serviceCollection) where TDb : ChatDb

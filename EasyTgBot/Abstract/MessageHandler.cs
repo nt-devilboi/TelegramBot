@@ -1,4 +1,3 @@
-using System.Windows.Input;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -33,9 +32,9 @@ internal class MessageHandler : IContextHandler
 
     public async Task Handle(Update update, ChatContext context, IContextFactory contextFactory)
     {
-        var text = update.Message.Text;
-        if (!_commands.TryGetValue(text, out var command) &
-            !_contexts.TryGetValue(context.State.ToString(), out var contextHandler))
+        var text = update.Message?.Text;
+        if (!_commands.TryGetValue(text ?? "", out var command) &
+            !_contexts.TryGetValue(context.State, out var contextHandler))
             await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "я не понял твоего сообщения");
 
 

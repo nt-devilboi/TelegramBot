@@ -4,9 +4,12 @@ using EasyOAuth.Extensions;
 using EasyTgBot;
 using EasyTgBot.Abstract;
 using CookingBot;
+using CookingBot.Application.Flows;
 using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 using CookingBot.Application.Flows.EditRecipe.InContext;
+using CookingBot.Application.Flows.Friends;
+using CookingBot.Application.Flows.Friends.InContext;
 using CookingBot.Application.Flows.WantToCook.InContexts;
 using CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
 using CookingBot.Application.Interfaces;
@@ -47,20 +50,20 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOptions<PostgresEntryPointOptions>()
     .Configure(x => x.ConnString = Environment.GetEnvironmentVariable("CONN_STRING"))
     .ValidateDataAnnotations();
-// easyTg
 
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController<MainMenuHandler>(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://04b053eaf1d353.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://81f17013f91dae.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
 
 
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
-builder.Services.AddContext<AddingRecipeContext>("Добавить рецепт",x => x
+builder.Services.AddContext<AddingRecipeContext>("рецепт",x => x
     .AddHandler<AddingName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()
@@ -70,12 +73,15 @@ builder.Services.AddContext<CookContext>("Хочу приготовить",x => 
     .AddHandler<ChoosingDish>()
     .AddHandler<Cooking>(), registerFlow);
 
+builder.Services.AddContext<FriendsContext>("Друзья", x => x.AddHandler<SwitchFriends>(x => x
+    .AddHandler<AddFriend>()
+    .AddHandler<CheckFriendRecipe>()), registerFlow);
+
 builder.Services.AddContext<EditContext>("Редактировать рецепт",x =>
         x.AddHandler<ChooseEditRecipe>()
             .AddHandler<SwitchEditItem>(x =>
-                x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>().AddSubHandler<EditIngredients>()),
+                x.AddHandler<EditInstruction>().AddHandler<EditName>().AddHandler<EditIngredients>()),
     registerFlow);
-
 
 builder.Services.AddSingleton<IServiceRegistryFlow>(registerFlow);
 var app = builder.Build();

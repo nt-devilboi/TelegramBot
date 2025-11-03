@@ -9,7 +9,10 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot;
 
-public class MainMenuHandler(IRecipeRepository repository, ITelegramBotClient botClient) : IStrategyOnMenu
+public class MainMenuHandler(
+    IRecipeRepository repository,
+    ITelegramBotClient botClient,
+    ITriggerProvider triggerProvider) : IStrategyOnMenu
 {
     public async Task Handle(ChatContext context)
     {
@@ -28,6 +31,7 @@ public class MainMenuHandler(IRecipeRepository repository, ITelegramBotClient bo
 
     private IReplyMarkup GetAvailableCommand()
     {
-        return new ReplyKeyboardMarkup([WantToCook.StaticTrigger, AddRecipe.StaticTrigger, "Редактировать рецепт"]); //todo: малось здесь кринже.
+        var routers = triggerProvider.GetAll().Select(x => new KeyboardButton(x.Value));
+        return new ReplyKeyboardMarkup(routers);
     }
 }

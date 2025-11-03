@@ -1,3 +1,4 @@
+using CookingBot.Application.Flows.Friends.InContext;
 using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
 using EasyTgBot.Infrastructure;
@@ -11,6 +12,7 @@ public class ChatTelegramDb(IOptions<PostgresEntryPointOptions> options) : ChatD
 {
     public DbSet<TelegramOAuth> LinkOAuths { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
+    public DbSet<Friend> Friends { get; set; }
     private readonly string ConnectionString = options.Value.ConnString;
 
 

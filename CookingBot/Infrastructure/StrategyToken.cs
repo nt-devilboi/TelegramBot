@@ -20,14 +20,18 @@ public class StrategyToken(
 {
     public override async Task Execute(string token, OAuthEntity data)
     {
-        var telegramOAuth = data as TelegramOAuth;
+        var telegramOAuth = data as TelegramOAuth; // по идей можно это исправить и сделать без этого
         var chatContext = ChatContext.CreateInAccountContext(telegramOAuth.chatId);
+        var firstName = (await bot.GetChatAsync(telegramOAuth.chatId)).FirstName;
+        
         var chat = new Chat
         {
             Token = token,
             Id = telegramOAuth.chatId,
+            Name = firstName
         };
 
+        
         await chatRepository.Add(chat);
         await contextRepository.Upsert(chatContext);
 

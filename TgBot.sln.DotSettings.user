@@ -44,11 +44,16 @@
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=069d7d63_002Df284_002D466c_002D81e9_002D0bcb93034bd0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Test1 #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::DD8390C9-34DE-43F0-B146-99BC20990C40::net8.0::EasyTgBot.Tests.Tests.CorrectWork_IF_UseAddHandlerAndAddSubHandle&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::DD8390C9-34DE-43F0-B146-99BC20990C40::net8.0::EasyTgBot.Tests.ContextAddExtension.Tests.CorrectWork_IF_UseAddHandlerAndAddSubHandle&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=574837e2_002D9b26_002D493e_002D8d26_002D8a552c68e207/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=574837e2_002D9b26_002D493e_002D8d26_002D8a552c68e207/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::DD8390C9-34DE-43F0-B146-99BC20990C40::net8.0::EasyTgBot.Tests.ContextAddExtension.Tests.CorrectWork_IF_UseAddHandlerAndAddSubHandle&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=93206471_002D0300_002D4231_002D9ab1_002D03c9157758b4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CorrectWork_IF_UseAddHandler" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::DD8390C9-34DE-43F0-B146-99BC20990C40::net8.0::EasyTgBot.Tests.ContextAddExtension.Tests.CorrectWork_IF_UseAddHandler&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
