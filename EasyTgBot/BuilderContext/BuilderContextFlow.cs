@@ -11,7 +11,6 @@ public class BuilderContextFlow<TState> where TState : struct, Enum
     private readonly List<FlowNode<TState>> _nodes = new();
 
     internal BuilderContextFlow(RangeFlowComponents<TState> rangeFreeFlowComponent, IServiceCollection collection,
-        bool isSubtask,
         List<StateEvent>? steps = null)
     {
         _collection = collection;
@@ -56,7 +55,7 @@ public class BuilderContextFlow<TState> where TState : struct, Enum
         _nodes.Add(switchNode);
         foreach (var action1 in events)
         {
-            var subTaskBuilder = new BuilderContextFlow<TState>(_rangeFreeFlowComponent, _collection, false, Steps);
+            var subTaskBuilder = new BuilderContextFlow<TState>(_rangeFreeFlowComponent, _collection, Steps);
             action1.action(subTaskBuilder);
 
             switchNode.Branches.Add(action1.name, subTaskBuilder._nodes[0]);
@@ -78,20 +77,4 @@ public class BuilderContextFlow<TState> where TState : struct, Enum
         Steps.Clear();
         Steps.AddRange(eventVisitor.Events);
     }
-}
-
-public class BuilderContextFlowSwitch<TState> where TState : struct, Enum
-{
-    private readonly IServiceCollection _collection;
-    private readonly RangeFlowComponents<TState> _rangeFreeFlowComponent;
-
-    internal BuilderContextFlowSwitch(RangeFlowComponents<TState> rangeFreeFlowComponent, IServiceCollection collection,
-        List<StateEvent> steps, string switchPosition)
-    {
-        _collection = collection;
-        _rangeFreeFlowComponent = rangeFreeFlowComponent;
-        Steps = steps;
-    }
-
-    public List<StateEvent> Steps { get; set; }
 }

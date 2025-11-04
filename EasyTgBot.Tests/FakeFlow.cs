@@ -1,6 +1,6 @@
 namespace EasyTgBot.Tests;
 
-public enum TestUserFlow
+public enum FakeFlow
 {
     Authorization,
     AddSecondName,

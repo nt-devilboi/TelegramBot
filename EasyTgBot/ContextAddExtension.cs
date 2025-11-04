@@ -12,10 +12,10 @@ public static class ContextAddExtension
         Action<BuilderContextFlow<TEnum>> builderFunc, IServiceRegistryFlow registryFlow) where TEnum : struct, Enum
     {
         var enums = Enum.GetValues<TEnum>();
-        var builder = new BuilderContextFlow<TEnum>(new RangeFlowComponents<TEnum>(enums), serviceCollection, false);
+        var builder = new BuilderContextFlow<TEnum>(new RangeFlowComponents<TEnum>(enums), serviceCollection);
 
         serviceCollection.AddScoped<Command>(_ => new Router<TEnum>(trigger));
-        var stateType = typeof(TEnum);
+        var stateType = typeof(TEnum); 
         var duplicate = serviceCollection.Any(SameContext<TEnum>(trigger));
         if (duplicate)
             throw new InvalidOperationException(
@@ -24,7 +24,6 @@ public static class ContextAddExtension
         serviceCollection.AddSingleton<IRouterTriggerDescriptor>(new RouterTriggerDescriptor(stateType, trigger));
         builderFunc(builder);
 
-        // собрать граф и сгенерировать события + зарегистрировать DI
         builder.Build();
 
         registryFlow.AddFlow<TEnum>(builder.Steps);

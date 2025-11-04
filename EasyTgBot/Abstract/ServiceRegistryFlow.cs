@@ -9,7 +9,7 @@ public interface IServiceRegistryFlow
     IStateMachine<TState> Wraps<TState>(StateMachine<TState, Trigger> stateMachine) where TState : struct, Enum;
 }
 
-public class ServiceRegistryFlow : IServiceRegistryFlow // мб в будущем сделать internal
+public class ServiceRegistryFlow : IServiceRegistryFlow //todo: make a internal class
 {
     private readonly Dictionary<Type, List<StateEvent>> Flows = new();
 
