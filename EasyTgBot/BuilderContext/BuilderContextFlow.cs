@@ -20,26 +20,18 @@ public class BuilderContextFlow<TState> where TState : struct, Enum
     }
 
 
-    public BuilderContextFlow<TState> AddHandler<TContextHandler>(Action<BuilderContextFlow<TState>>? action = null)
+    public BuilderContextFlow<TState> AddHandler<TContextHandler>()
         where TContextHandler : class, IContextHandler
     {
         if (_rangeFreeFlowComponent.Empty) throw new ArgumentException("capacity for handler is exhausted");
         var start = _rangeFreeFlowComponent.FreeState;
         _rangeFreeFlowComponent.Next();
-        
+
         var node = new HandlerNode<TState>
         {
             State = start,
             HandlerType = typeof(TContextHandler)
         };
-
-        if (action != null)
-        {
-            var subTaskBuilder = new BuilderContextFlow<TState>(_rangeFreeFlowComponent, _collection, true, Steps);
-
-            action(subTaskBuilder);
-            node.SubTasks.AddRange(subTaskBuilder._nodes);
-        }
 
         _nodes.Add(node);
         _rangeFreeFlowComponent.PrevHandler = start;
@@ -48,10 +40,29 @@ public class BuilderContextFlow<TState> where TState : struct, Enum
 
 
     public BuilderContextFlow<TState> AddSwitch<TContextHandler>(
-        params Action<BuilderContextFlowSwitch<TState>>[] action)
+        params (Action<BuilderContextFlow<TState>> action, string name)[] events)
         where TContextHandler : class, IContextHandler
     {
-        throw new NotImplementedException();
+        if (_rangeFreeFlowComponent.Empty) throw new ArgumentException("capacity for handler is exhausted");
+        var start = _rangeFreeFlowComponent.FreeState;
+        _rangeFreeFlowComponent.Next();
+
+        var switchNode = new SwitchNode<TState>
+        {
+            HandlerType = typeof(TContextHandler),
+            State = start
+        };
+
+        _nodes.Add(switchNode);
+        foreach (var action1 in events)
+        {
+            var subTaskBuilder = new BuilderContextFlow<TState>(_rangeFreeFlowComponent, _collection, false, Steps);
+            action1.action(subTaskBuilder);
+
+            switchNode.Branches.Add(action1.name, subTaskBuilder._nodes[0]);
+        }
+
+        return this;
     }
 
     public void Build()

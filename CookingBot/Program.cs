@@ -21,7 +21,9 @@ using Microsoft.EntityFrameworkCore;
 using EditContext = CookingBot.Application.Flows.EditRecipe.EditContext;
 
 var builder = WebApplication.CreateBuilder(args);
-var oAuths = OAuths.CreateBuilder(Environment.GetEnvironmentVariable("REDIRECT_URI_OATUTH") ?? throw new Exception("\"REDIRECT_URI_OATUTH\" ENV VAR doesn't exist")); // это редирект когда уже авторизация заверешна и нужно переправить обратно в тг канал.
+var oAuths = OAuths.CreateBuilder(Environment.GetEnvironmentVariable("REDIRECT_URI_OATUTH") ??
+                                  throw new Exception(
+                                      "\"REDIRECT_URI_OATUTH\" ENV VAR doesn't exist")); // это редирект когда уже авторизация заверешна и нужно переправить обратно в тг канал.
 oAuths.AddOAuth("google", _ =>
     _.SetUriPageAuth("https://accounts.google.com/o/oauth2/v2/auth")
         .SetUriGetAccessToken("https://oauth2.googleapis.com/token")
@@ -53,7 +55,7 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 
 builder.Services.AddTelegramCommands();
 builder.Services.AddTelegramBotWithController<MainMenuHandler>(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://81f17013f91dae.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://0db002df161216.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
@@ -63,25 +65,30 @@ builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
-builder.Services.AddContext<AddingRecipeContext>("рецепт",x => x
+builder.Services.AddContext<AddingRecipeContext>("рецепт", x => x
     .AddHandler<AddingName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()
     .AddHandler<SaveRecipe>(), registerFlow);
 
-builder.Services.AddContext<CookContext>("Хочу приготовить",x => x
+builder.Services.AddContext<CookContext>("Хочу приготовить", x => x
     .AddHandler<ChoosingDish>()
     .AddHandler<Cooking>(), registerFlow);
 
-builder.Services.AddContext<FriendsContext>("Друзья", x => x.AddHandler<SwitchFriends>(x => x
-    .AddHandler<AddFriend>()
-    .AddHandler<CheckFriendRecipe>()), registerFlow);
+builder.Services.AddContext<FriendsContext>("Друзья",
+    x => x.AddSwitch<SwitchFriends>(
+        (x => x.AddHandler<AddFriend>(), "Добавить друга"),
+        (x => x.AddHandler<CheckFriendRecipe>(), "Посмотреть рецепты"))
+    , registerFlow);
 
-builder.Services.AddContext<EditContext>("Редактировать рецепт",x =>
-        x.AddHandler<ChooseEditRecipe>()
-            .AddHandler<SwitchEditItem>(x =>
-                x.AddHandler<EditInstruction>().AddHandler<EditName>().AddHandler<EditIngredients>()),
+builder.Services.AddContext<EditContext>("Редактировать рецепт",
+    x => x.AddHandler<ChooseEditRecipe>()
+        .AddSwitch<SwitchEditItem>(
+            (x => x.AddHandler<EditInstruction>(), "Инструкцию"),
+            (x => x.AddHandler<EditName>(), "Название"),
+            (x => x.AddHandler<EditIngredients>(), "Ингредиенты")),
     registerFlow);
+
 
 builder.Services.AddSingleton<IServiceRegistryFlow>(registerFlow);
 var app = builder.Build();
