@@ -8,47 +8,73 @@ public class BuilderContextFlow<TState> where TState : struct, Enum
     private readonly IServiceCollection _collection;
     private readonly RangeFlowComponents<TState> _rangeFreeFlowComponent;
     internal readonly List<StateEvent> Steps = [];
-    private readonly TState[] _state;
+    private readonly List<FlowNode<TState>> _nodes = new();
 
-    internal BuilderContextFlow(IServiceCollection collection, RangeFlowComponents<TState> rangeFreeFlowComponent)
+    internal BuilderContextFlow(RangeFlowComponents<TState> rangeFreeFlowComponent, IServiceCollection collection,
+        List<StateEvent>? steps = null)
     {
         _collection = collection;
         _rangeFreeFlowComponent = rangeFreeFlowComponent;
+        Steps = steps ?? [];
     }
 
 
-    public BuilderContextFlow<TState> AddHandler<TContextHandler>(Action<BuilderSubFlowContext<TState>>? action = null)
+    public BuilderContextFlow<TState> AddHandler<TContextHandler>()
         where TContextHandler : class, IContextHandler
     {
         if (_rangeFreeFlowComponent.Empty) throw new ArgumentException("capacity for handler is exhausted");
-
-
-        _collection.AddScoped<TContextHandler>();
-
         var start = _rangeFreeFlowComponent.FreeState;
-
-        if (!_rangeFreeFlowComponent.IsStart)
-            Steps.Add(new StateEvent(Trigger.UserWantToContinue, _rangeFreeFlowComponent.PrevHandler, start));
-
-        _collection.AddScoped<IHandlerInfo>(x =>
-            new IHandlerInfo((IContextHandler)x.GetService(typeof(TContextHandler)), start.ToString()));
-
         _rangeFreeFlowComponent.Next();
 
-        if (action != null)
+        var node = new HandlerNode<TState>
         {
-            var subTaskBuilder = new BuilderSubFlowContext<TState>(Steps, _rangeFreeFlowComponent, _collection);
-            action(subTaskBuilder);
-            var end = _rangeFreeFlowComponent.PrevState;
-            Steps.Add(new StateEvent(Trigger.UserCompletedAllSubTask, end, start));
-            for (var i = (int)(object)start + 1; i <= (int)(object)end; i++)
-            {
-                Steps.Add(new StateEvent(Trigger.UserGoToSubTask, start, (TState)(object)i,
-                    ((TState)(object)i).ToString()));
-            }
-        }
+            State = start,
+            HandlerType = typeof(TContextHandler)
+        };
 
+        _nodes.Add(node);
         _rangeFreeFlowComponent.PrevHandler = start;
         return this;
+    }
+
+
+    public BuilderContextFlow<TState> AddSwitch<TContextHandler>(
+        params (Action<BuilderContextFlow<TState>> action, string name)[] events)
+        where TContextHandler : class, IContextHandler
+    {
+        if (_rangeFreeFlowComponent.Empty) throw new ArgumentException("capacity for handler is exhausted");
+        var start = _rangeFreeFlowComponent.FreeState;
+        _rangeFreeFlowComponent.Next();
+
+        var switchNode = new SwitchNode<TState>
+        {
+            HandlerType = typeof(TContextHandler),
+            State = start
+        };
+
+        _nodes.Add(switchNode);
+        foreach (var action1 in events)
+        {
+            var subTaskBuilder = new BuilderContextFlow<TState>(_rangeFreeFlowComponent, _collection, Steps);
+            action1.action(subTaskBuilder);
+
+            switchNode.Branches.Add(action1.name, subTaskBuilder._nodes[0]);
+        }
+
+        return this;
+    }
+
+    internal void Build()
+    {
+        var serviceVisitor = new ServiceRegistrationVisitor<TState>(_collection);
+        foreach (var node in _nodes)
+            node.Accept(serviceVisitor);
+
+        var eventVisitor = new StateEventGeneratorVisitor<TState>();
+        foreach (var node in _nodes)
+            node.Accept(eventVisitor);
+
+        Steps.Clear();
+        Steps.AddRange(eventVisitor.Events);
     }
 }

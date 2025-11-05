@@ -6,5 +6,5 @@ public interface IChatRepository
 {
     public Task Add(Chat chat);
 
-    public Task<Chat> Get(long chatId);
+    public Task<Chat?> Get(long chatId);
 }

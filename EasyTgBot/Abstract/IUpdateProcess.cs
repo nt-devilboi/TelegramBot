@@ -1,6 +1,7 @@
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace EasyTgBot.Abstract;
 
@@ -18,17 +19,32 @@ internal class UpdateProcess(
 {
     public async Task Update(Update update)
     {
-        if (update.Message?.Text != null)
+        var id = GetChatId(update);
+
+        if (id == null)
         {
-            var context = await contextRepository.Get(update.Message.Chat.Id) ?? NotAuthorized();
-            await messageHandler.Handle(update, context, contextFactory);
+            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id,
+                "Я умею понимать только сообщения");
         }
         else
         {
-            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Я умею понимать только сообщения");
+            var context = await contextRepository.Get(id.Value) ?? NotAuthorized();
+            await messageHandler.Handle(update, context, contextFactory);
         }
     }
 
+    private long? GetChatId(Update update)
+    {
+        return update.Type switch
+        {
+            UpdateType.Message => update.Message?.Chat.Id,
+            UpdateType.CallbackQuery => update.CallbackQuery?.Message?.Chat.Id,
+            UpdateType.EditedMessage => update.EditedMessage?.Chat.Id,
+            UpdateType.ChannelPost => update.ChannelPost?.Chat.Id,
+            UpdateType.MyChatMember => update.MyChatMember?.Chat.Id,
+            _ => null
+        };
+    }
 
     private ChatContext NotAuthorized()
     {

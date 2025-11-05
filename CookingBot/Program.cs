@@ -4,9 +4,12 @@ using EasyOAuth.Extensions;
 using EasyTgBot;
 using EasyTgBot.Abstract;
 using CookingBot;
+using CookingBot.Application.Flows;
 using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 using CookingBot.Application.Flows.EditRecipe.InContext;
+using CookingBot.Application.Flows.Friends;
+using CookingBot.Application.Flows.Friends.InContext;
 using CookingBot.Application.Flows.WantToCook.InContexts;
 using CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
 using CookingBot.Application.Interfaces;
@@ -18,7 +21,9 @@ using Microsoft.EntityFrameworkCore;
 using EditContext = CookingBot.Application.Flows.EditRecipe.EditContext;
 
 var builder = WebApplication.CreateBuilder(args);
-var oAuths = OAuths.CreateBuilder(Environment.GetEnvironmentVariable("REDIRECT_URI_OATUTH") ?? throw new Exception("\"REDIRECT_URI_OATUTH\" ENV VAR doesn't exist")); // это редирект когда уже авторизация заверешна и нужно переправить обратно в тг канал.
+var oAuths = OAuths.CreateBuilder(Environment.GetEnvironmentVariable("REDIRECT_URI_OATUTH") ??
+                                  throw new Exception(
+                                      "\"REDIRECT_URI_OATUTH\" ENV VAR doesn't exist")); // это редирект когда уже авторизация заверешна и нужно переправить обратно в тг канал.
 oAuths.AddOAuth("google", _ =>
     _.SetUriPageAuth("https://accounts.google.com/o/oauth2/v2/auth")
         .SetUriGetAccessToken("https://oauth2.googleapis.com/token")
@@ -47,33 +52,41 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOptions<PostgresEntryPointOptions>()
     .Configure(x => x.ConnString = Environment.GetEnvironmentVariable("CONN_STRING"))
     .ValidateDataAnnotations();
-// easyTg
 
-builder.Services.AddTelegramCommands();
+builder.Services.AddBaseTelegramCommands();
 builder.Services.AddTelegramBotWithController<MainMenuHandler>(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://04b053eaf1d353.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://e026e6e3b567a1.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
 
 
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
-builder.Services.AddContext<AddingRecipeContext>("Добавить рецепт",x => x
+builder.Services.AddContext<AddingRecipeContext>("добавить рецепт", x => x
     .AddHandler<AddingName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()
     .AddHandler<SaveRecipe>(), registerFlow);
 
-builder.Services.AddContext<CookContext>("Хочу приготовить",x => x
+builder.Services.AddContext<CookContext>("Хочу приготовить", x => x
     .AddHandler<ChoosingDish>()
     .AddHandler<Cooking>(), registerFlow);
 
-builder.Services.AddContext<EditContext>("Редактировать рецепт",x =>
-        x.AddHandler<ChooseEditRecipe>()
-            .AddHandler<SwitchEditItem>(x =>
-                x.AddSubHandler<EditInstruction>().AddSubHandler<EditName>().AddSubHandler<EditIngredients>()),
+/*builder.Services.AddContext<FriendsContext>("Друзья",
+    x => x.AddSwitch<SwitchFriends>(
+        (x => x.AddHandler<AddFriend>(), "Добавить друга"),
+        (x => x.AddHandler<CheckFriendRecipe>(), "Посмотреть рецепты"))
+    , registerFlow);*/
+
+builder.Services.AddContext<EditContext>("Редактировать рецепт",
+    x => x.AddHandler<ChooseEditRecipe>()
+        .AddSwitch<SwitchEditItem>(
+            (x => x.AddHandler<EditInstruction>(), "Инструкцию"),
+            (x => x.AddHandler<EditName>(), "Название"),
+            (x => x.AddHandler<EditIngredients>(), "Ингредиенты")),
     registerFlow);
 
 

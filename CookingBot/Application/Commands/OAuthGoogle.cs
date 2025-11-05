@@ -46,4 +46,7 @@ public class OAuthGoogle(IOAuthClient authClient, ILog log, ITelegramBotClient b
         await botClient.SendTextMessageAsync(chatId.ToString(), "выбери где авторизоваться", parseMode: ParseMode.Html,
             replyMarkup: bottons);
     }
+    
+    
+    
 }

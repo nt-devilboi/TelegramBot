@@ -1,4 +1,3 @@
-using System.Windows.Input;
 using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -33,9 +32,9 @@ internal class MessageHandler : IContextHandler
 
     public async Task Handle(Update update, ChatContext context, IContextFactory contextFactory)
     {
-        var text = update.Message.Text;
-        if (!_commands.TryGetValue(text, out var command) &
-            !_contexts.TryGetValue(context.State.ToString(), out var contextHandler))
+        var text = update.Message?.Text;
+        if (!_commands.TryGetValue(text ?? "", out var command) &
+            !_contexts.TryGetValue(context.State, out var contextHandler))
             await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "я не понял твоего сообщения");
 
 
@@ -43,23 +42,21 @@ internal class MessageHandler : IContextHandler
         if (command is { Priority: Priority.SystemCommand })
         {
             await command.Execute(update, context);
-            await _contextRepository.Upsert(context);
         }
 
         else if (contextHandler != null && contextHandler != this)
         {
             await contextHandler.Handle(update, context, contextFactory);
-            await _contextRepository.Upsert(context);
         }
 
         else if (command is { Priority: Priority.Command })
         {
             await command.Execute(update, context);
-            await _contextRepository.Upsert(context);
         }
         else
         {
             await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "Я ваще ничего не понял"); // сделать изменить
+            return;
         }
 
         if (string.CompareOrdinal(context.State, oldState) != 0 &&
@@ -67,6 +64,8 @@ internal class MessageHandler : IContextHandler
         {
             await contextHandler.Enter(context, contextFactory);
         }
+
+        await _contextRepository.Upsert(context);
     }
 
     async Task IContextHandler.Enter(ChatContext context, IContextFactory _)

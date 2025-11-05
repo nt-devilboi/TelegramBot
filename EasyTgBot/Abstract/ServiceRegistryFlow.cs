@@ -9,7 +9,7 @@ public interface IServiceRegistryFlow
     IStateMachine<TState> Wraps<TState>(StateMachine<TState, Trigger> stateMachine) where TState : struct, Enum;
 }
 
-public class ServiceRegistryFlow : IServiceRegistryFlow // мб в будущем сделать internal
+public class ServiceRegistryFlow : IServiceRegistryFlow //todo: make a internal class
 {
     private readonly Dictionary<Type, List<StateEvent>> Flows = new();
 
@@ -26,11 +26,7 @@ public class ServiceRegistryFlow : IServiceRegistryFlow // мб в будуще�
         foreach (var stateEvent in Flows[typeof(TState)])
         {
             var stateConfiguration = stateMachine.Configure((TState)stateEvent.Source);
-            if (stateEvent.Trigger == Trigger.UserCompletedSubTask)
-            {
-                stateMachine.Configure((TState)stateEvent.Dest).SubstateOf((TState)stateEvent.Source);
-            }
-
+            
             if (stateEvent.Trigger == Trigger.UserGoToSubTask)
             {
                 stateConfiguration.PermitIf(approveTrigger, (TState)stateEvent.Dest, x => stateEvent.NameHandler == x);

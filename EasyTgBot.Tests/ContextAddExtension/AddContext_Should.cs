@@ -21,16 +21,60 @@ public class Tests
     public void CorrectWork_IF_UseAddHandlerAndAddSubHandle()
     {
         var serviceRegistry = collection.BuildServiceProvider().GetService<IServiceRegistryFlow>();
-        collection.AddContext<TestUserFlow>("test",
-            x => x.AddHandler<FakeHandler>(x => x.AddSubHandler<FakeHandler>()
-                    .AddSubHandler<FakeHandler2>())
+        collection.AddContext<FakeFlow>("test",
+            x => x.AddSwitch<FakeSwitch>(
+                    (x => x.AddHandler<FakeHandler>(), "whoap"),
+                    (x => x.AddHandler<FakeHandler>(), "lol"))
                 .AddHandler<FakeHandler>(),
             serviceRegistry);
 
-        var stateMachine = new StateMachine<TestUserFlow, Trigger>(TestUserFlow.Authorization);
+        var stateMachine = new StateMachine<FakeFlow, Trigger>(FakeFlow.Authorization);
         serviceRegistry.Wraps(stateMachine);
 
-        var enums = Enum.GetValues<TestUserFlow>();
+        var enums = Enum.GetValues<FakeFlow>();
+        var states = stateMachine.GetInfo().States.ToArray();
+        states.Length.Should().Be(enums.Length);
+        for (var i = 0; i < enums.Length; i++)
+        {
+            states[i].UnderlyingState.Should().Be(enums[i]);
+        }
+
+
+        var userGoToSubTask =
+            new StateMachine<FakeFlow, Trigger>.TriggerWithParameters<string>(Trigger.UserGoToSubTask);
+
+
+        stateMachine.Fire(userGoToSubTask, FakeFlow.AddSecondName.ToString());
+        stateMachine.State.Should().Be(FakeFlow.AddSecondName);
+
+
+        stateMachine = new StateMachine<FakeFlow, Trigger>(FakeFlow.Authorization);
+        serviceRegistry.Wraps(stateMachine);
+        stateMachine.Fire(userGoToSubTask, FakeFlow.AddOld.ToString());
+        stateMachine.State.Should().Be(FakeFlow.AddOld);
+
+        stateMachine = new StateMachine<FakeFlow, Trigger>(FakeFlow.Authorization);
+        serviceRegistry.Wraps(stateMachine);
+        
+        stateMachine.Fire(Trigger.UserWantToContinue);
+        stateMachine.State.Should().Be(FakeFlow.AddName);
+    }
+
+    [Test]
+    public void CorrectWork_IF_UseAddHandler()
+    {
+        var serviceRegistry = collection.BuildServiceProvider().GetService<IServiceRegistryFlow>();
+        collection.AddContext<FakeFlow>("test",
+            x => x.AddHandler<FakeHandler>()
+                .AddHandler<FakeHandler2>()
+                .AddHandler<FakeHandler2>()
+                .AddHandler<FakeHandler>(),
+            serviceRegistry);
+
+        var stateMachine = new StateMachine<FakeFlow, Trigger>(FakeFlow.Authorization);
+        serviceRegistry.Wraps(stateMachine);
+
+        var enums = Enum.GetValues<FakeFlow>();
         var states = stateMachine.GetInfo().States.ToArray();
         enums.Length.Should().Be(states.Length);
         for (var i = 0; i < enums.Length; i++)
@@ -39,51 +83,69 @@ public class Tests
         }
 
 
-        states[0].Substates.ToArray()[0].UnderlyingState.Should().Be(TestUserFlow.AddSecondName);
-        var userGoToSubTask =
-            new StateMachine<TestUserFlow, Trigger>.TriggerWithParameters<string>(Trigger.UserGoToSubTask);
+        stateMachine.State.Should().Be(FakeFlow.Authorization);
+        stateMachine.Fire(Trigger.UserWantToContinue);
 
-        stateMachine.State.Should().Be(TestUserFlow.Authorization);
-        stateMachine.Fire(Trigger.UserCompletedSubTask);
+        stateMachine.State.Should().Be(FakeFlow.AddSecondName);
+        stateMachine.Fire(Trigger.UserWantToContinue);
 
-        stateMachine.State.Should().Be(TestUserFlow.AddSecondName);
-        stateMachine.Fire(Trigger.UserCompletedSubTask);
+        stateMachine.State.Should().Be(FakeFlow.AddOld);
+        stateMachine.Fire(Trigger.UserWantToContinue);
 
-        stateMachine.State.Should().Be(TestUserFlow.AddOld);
-        stateMachine.Fire(Trigger.UserCompletedAllSubTask);
+        stateMachine.State.Should().Be(FakeFlow.AddName);
+    }
 
-        stateMachine.State.Should().Be(TestUserFlow.Authorization);
-        stateMachine.Fire(userGoToSubTask, TestUserFlow.AddOld.ToString());
+    [Test]
+    public void CorrectWork_IF_MoveToSwitch()
+    {
+        var serviceRegistry = collection.BuildServiceProvider().GetService<IServiceRegistryFlow>();
+        collection.AddContext<FakeFlow>("test",
+            x => x.AddHandler<FakeHandler2>().AddSwitch<FakeSwitch>(
+                (x => x.AddHandler<FakeHandler>(), "whoap")),
+            serviceRegistry);
 
-        stateMachine.State.Should().Be(TestUserFlow.AddOld);
-        stateMachine.Fire(Trigger.UserCompletedAllSubTask);
+        var stateMachine = new StateMachine<FakeFlow, Trigger>(FakeFlow.Authorization);
+        serviceRegistry.Wraps(stateMachine);
 
         stateMachine.Fire(Trigger.UserWantToContinue);
-        stateMachine.State.Should().Be(TestUserFlow.AddName);
+        stateMachine.State.Should().Be(FakeFlow.AddSecondName);
     }
 }
 
-public class FakeHandler : ContextHandler<BasePayload, TestUserFlow>
+public class FakeHandler : ContextHandler<BasePayload, FakeFlow>
 {
-    protected override async Task Handle(Update update, DetailContext<BasePayload, TestUserFlow> context)
+    protected override async Task Handle(Update update, DetailContext<BasePayload, FakeFlow> context)
     {
         context.State.Continue();
     }
 
-    protected override Task Enter(DetailContext<BasePayload, TestUserFlow> context)
+    protected override Task Enter(DetailContext<BasePayload, FakeFlow> context)
     {
         throw new NotImplementedException();
     }
 }
 
-public class FakeHandler2 : ContextHandler<BasePayload, TestUserFlow>
+public class FakeSwitch : ContextHandler<BasePayload, FakeFlow>
 {
-    protected override async Task Handle(Update update, DetailContext<BasePayload, TestUserFlow> context)
+    protected override async Task Handle(Update update, DetailContext<BasePayload, FakeFlow> context)
     {
         context.State.Continue();
     }
 
-    protected override Task Enter(DetailContext<BasePayload, TestUserFlow> context)
+    protected override Task Enter(DetailContext<BasePayload, FakeFlow> context)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class FakeHandler2 : ContextHandler<BasePayload, FakeFlow>
+{
+    protected override async Task Handle(Update update, DetailContext<BasePayload, FakeFlow> context)
+    {
+        context.State.Continue();
+    }
+
+    protected override Task Enter(DetailContext<BasePayload, FakeFlow> context)
     {
         throw new NotImplementedException();
     }

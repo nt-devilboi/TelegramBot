@@ -14,7 +14,7 @@ public class BotController(
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Update? update)
     {
-        if (update?.Message == null) return new OkResult();
+        if (update?.Message == null && update?.CallbackQuery == null) return new OkResult();
 
         try
         {
