@@ -53,9 +53,9 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
     .Configure(x => x.ConnString = Environment.GetEnvironmentVariable("CONN_STRING"))
     .ValidateDataAnnotations();
 
-builder.Services.AddTelegramCommands();
+builder.Services.AddBaseTelegramCommands();
 builder.Services.AddTelegramBotWithController<MainMenuHandler>(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://36366a9f4b328e.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://e026e6e3b567a1.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
@@ -65,7 +65,7 @@ builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
-builder.Services.AddContext<AddingRecipeContext>("рецепт", x => x
+builder.Services.AddContext<AddingRecipeContext>("добавить рецепт", x => x
     .AddHandler<AddingName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()
@@ -75,11 +75,11 @@ builder.Services.AddContext<CookContext>("Хочу приготовить", x =>
     .AddHandler<ChoosingDish>()
     .AddHandler<Cooking>(), registerFlow);
 
-builder.Services.AddContext<FriendsContext>("Друзья",
+/*builder.Services.AddContext<FriendsContext>("Друзья",
     x => x.AddSwitch<SwitchFriends>(
         (x => x.AddHandler<AddFriend>(), "Добавить друга"),
         (x => x.AddHandler<CheckFriendRecipe>(), "Посмотреть рецепты"))
-    , registerFlow);
+    , registerFlow);*/
 
 builder.Services.AddContext<EditContext>("Редактировать рецепт",
     x => x.AddHandler<ChooseEditRecipe>()

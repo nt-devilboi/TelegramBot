@@ -37,7 +37,7 @@ public static class ExtensionBotTgDi
         serviceCollection.AddScoped<IContextRepository, ContextRepository>();
     }
 
-    public static IServiceCollection AddTelegramCommands(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddBaseTelegramCommands(this IServiceCollection serviceCollection)
     {
         var assembly = Assembly.GetCallingAssembly();
         var commandsTypes = GetCommandsFrom(assembly);

@@ -42,23 +42,21 @@ internal class MessageHandler : IContextHandler
         if (command is { Priority: Priority.SystemCommand })
         {
             await command.Execute(update, context);
-            await _contextRepository.Upsert(context);
         }
 
         else if (contextHandler != null && contextHandler != this)
         {
             await contextHandler.Handle(update, context, contextFactory);
-            await _contextRepository.Upsert(context);
         }
 
         else if (command is { Priority: Priority.Command })
         {
             await command.Execute(update, context);
-            await _contextRepository.Upsert(context);
         }
         else
         {
             await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "Я ваще ничего не понял"); // сделать изменить
+            return;
         }
 
         if (string.CompareOrdinal(context.State, oldState) != 0 &&
@@ -66,6 +64,8 @@ internal class MessageHandler : IContextHandler
         {
             await contextHandler.Enter(context, contextFactory);
         }
+
+        await _contextRepository.Upsert(context);
     }
 
     async Task IContextHandler.Enter(ChatContext context, IContextFactory _)

@@ -64,7 +64,7 @@ public class BuilderContextFlow<TState> where TState : struct, Enum
         return this;
     }
 
-    public void Build()
+    internal void Build()
     {
         var serviceVisitor = new ServiceRegistrationVisitor<TState>(_collection);
         foreach (var node in _nodes)

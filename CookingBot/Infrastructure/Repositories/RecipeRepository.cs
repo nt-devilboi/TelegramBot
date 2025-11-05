@@ -26,7 +26,7 @@ public class RecipeRepository(ChatTelegramDb chatTelegramDb) : IRecipeRepository
         await chatTelegramDb.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<Recipe>> Get(long chatId)
+    public async Task<List<Recipe>> Get(long chatId)
     {
         return await chatTelegramDb.Recipes.Where(x => x.ChatId == chatId).ToListAsync();
     }

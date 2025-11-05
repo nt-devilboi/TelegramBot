@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using CookingBot.Application.Interfaces;
@@ -16,23 +17,38 @@ public partial class ChoosingDish(
     ITelegramBotClient botClient)
     : ContextHandler<CookPayload, CookContext>
 {
-    [GeneratedRegex(@"^.+(?=\. )")]
-    private static partial Regex TakeNameDish();
+    private const string Next = "Дальше";
+    private const int Take = 3;
+
 
     private static string WhatDoYouWantToCook = "Что хочешь приготовить?";
 
     protected override async Task Handle(Update update, DetailContext<CookPayload, CookContext> context)
     {
-        var request = update.AsRequestWithText();
-        var recipeName = TakeNameDish().Match(request.Value).Value;
-        var recipe = await recipeRepository.Get(recipeName);
-        if (recipe == null)
+        var request = update.CallbackQuery?.Data;
+        if (request == null || !context.TryGetPayload(out var payload)) return;
+
+        if ((request.StartsWith(Next) || request.StartsWith(Back)) &&
+            int.TryParse(request.Split("_")[1], out var offset))
         {
-            await botClient.SendTextMessageAsync(request.GetChatId(), $"Нету рецепта с названием {recipeName}");
+            var recipes = await recipeRepository.Get(context.ChatId);
+
+            await botClient.EditMessageReplyMarkupAsync(context.ChatId, payload.MessageId,
+                replyMarkup: new InlineKeyboardMarkup(
+                    GetButtons(recipes, offset)));
+
             return;
         }
 
-        var cook = new CookPayload(recipe.nameRecipe);
+
+        var recipe = await recipeRepository.Get(request);
+        if (recipe == null)
+        {
+            await botClient.SendTextMessageAsync(context.ChatId, $"Нету рецепта с названием {request}");
+            return;
+        }
+
+        var cook = new CookPayload(recipe.nameRecipe, payload.MessageId);
         context.UpdatePayload(cook);
 
         context.State.Continue();
@@ -41,21 +57,38 @@ public partial class ChoosingDish(
     protected override async Task Enter(DetailContext<CookPayload, CookContext> context)
     {
         var recipes = await recipeRepository.Get(context.ChatId);
-        await botClient.SendTextMessageAsync(context.ChatId, WhatDoYouWantToCook,
-            replyMarkup: new ReplyKeyboardMarkup(
+        var message = await botClient.SendTextMessageAsync(context.ChatId, WhatDoYouWantToCook,
+            replyMarkup: new InlineKeyboardMarkup(
                 GetButtons(recipes)));
+
+        context.UpdatePayload(new CookPayload("", message.MessageId));
     }
 
 
-    private IEnumerable<KeyboardButton> GetButtons(IReadOnlyList<Recipe> recipes)
+    private IEnumerable<InlineKeyboardButton[]> GetButtons(List<Recipe> recipes, int offset = 0, int take = Take)
     {
-        foreach (var recipe in recipes)
+        recipes.Sort((x, y) =>
+            (x.WasCookedLastTime ?? DateTime.MinValue).CompareTo(y.WasCookedLastTime ?? DateTime.MinValue));
+
+        foreach (var recipe in recipes.Skip(offset).Take(take))
         {
             var date = recipe.WasCookedLastTime?.ToString("dd MMMM yyyy года", CultureInfo.GetCultureInfo("ru-RU"));
             var stringData = date != null ? $"Готовилось {date}" : "Не готовил";
-            yield return new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}. {stringData}");
+            yield return
+            [
+                InlineKeyboardButton.WithCallbackData($"{ToUpperFirst(recipe.nameRecipe)}. \n {stringData}",
+                    recipe.nameRecipe)
+            ];
         }
+
+        yield return
+        [
+            InlineKeyboardButton.WithCallbackData(Back, $"{Back}_{offset - take}"),
+            InlineKeyboardButton.WithCallbackData(Next, $"{Next}_{offset + take}"),
+        ];
     }
+
+    private const string Back = "Назад";
 
     private string ToUpperFirst(string str)
     {
