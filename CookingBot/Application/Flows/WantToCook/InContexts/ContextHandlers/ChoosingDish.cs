@@ -31,7 +31,7 @@ public partial class ChoosingDish(
         if ((request.StartsWith(Next) || request.StartsWith(Back)) &&
             int.TryParse(request.Split("_")[1], out var offset))
         {
-            var recipes = await recipeRepository.Get(context.ChatId);
+            var recipes = await recipeRepository.GetByChatId(context.ChatId);
 
             await botClient.EditMessageReplyMarkupAsync(context.ChatId, payload.MessageId,
                 replyMarkup: new InlineKeyboardMarkup(
@@ -41,10 +41,10 @@ public partial class ChoosingDish(
         }
 
 
-        var recipe = await recipeRepository.Get(request);
+        var recipe = await recipeRepository.GetById(long.Parse(request));
         if (recipe == null)
         {
-            await botClient.SendTextMessageAsync(context.ChatId, $"Нету рецепта с названием {request}");
+            await botClient.SendTextMessageAsync(context.ChatId, $"Рецепт не нашел {request}");
             return;
         }
 
@@ -56,7 +56,7 @@ public partial class ChoosingDish(
 
     protected override async Task Enter(DetailContext<CookPayload, CookContext> context)
     {
-        var recipes = await recipeRepository.Get(context.ChatId);
+        var recipes = await recipeRepository.GetByChatId(context.ChatId);
         var message = await botClient.SendTextMessageAsync(context.ChatId, WhatDoYouWantToCook,
             replyMarkup: new InlineKeyboardMarkup(
                 GetButtons(recipes)));
@@ -77,7 +77,7 @@ public partial class ChoosingDish(
             yield return
             [
                 InlineKeyboardButton.WithCallbackData($"{ToUpperFirst(recipe.nameRecipe)}. \n {stringData}",
-                    recipe.nameRecipe)
+                    $"select_{recipe.Id}")
             ];
         }
 

@@ -11,7 +11,7 @@ public class EditInstruction(IRecipeRepository recipeRepository, ITelegramBotCli
     {
         if (!context.TryGetPayload(out var payload)) return;
 
-        var oldPayload = (await recipeRepository.Get(payload.NameRecipe))!; //  я уверен, так как в прошлом контексте это проверялось.
+        var oldPayload = (await recipeRepository.GetByChatId(payload.NameRecipe))!; //  я уверен, так как в прошлом контексте это проверялось.
 
         oldPayload.Instruction = update.Message.Text;
 
@@ -24,7 +24,7 @@ public class EditInstruction(IRecipeRepository recipeRepository, ITelegramBotCli
     protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
     {
         if (!context.TryGetPayload(out var payload)) return;
-        var recipe = await recipeRepository.Get(payload.NameRecipe);
+        var recipe = await recipeRepository.GetByChatId(payload.NameRecipe);
         await botClient.SendTextMessageAsync(context.ChatId, "Хорошо давай изменим инструкцию \n сейчас она такая");
         await botClient.SendTextMessageAsync(context.ChatId, recipe!.Instruction);
         await botClient.SendTextMessageAsync(context.ChatId, "Напиши новую версию");

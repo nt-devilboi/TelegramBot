@@ -22,7 +22,7 @@ public class ChooseEditRecipe(ITelegramBotClient botClient, IRecipeRepository re
             return;
         }
 
-        var recipe = await recipeRepository.Get(nameRecipe);
+        var recipe = await recipeRepository.GetByChatId(nameRecipe);
         if (recipe == null)
         {
             await botClient.SendTextMessageAsync(context.ChatId, "Такого рецепта нету");
@@ -35,7 +35,7 @@ public class ChooseEditRecipe(ITelegramBotClient botClient, IRecipeRepository re
 
     protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
     {
-        var recipes = await recipeRepository.Get(context.ChatId);
+        var recipes = await recipeRepository.GetByChatId(context.ChatId);
 
         await botClient.SendTextMessageAsync(context.ChatId, "Какой рецепт хочешь отредактировать",
             replyMarkup: new ReplyKeyboardMarkup(GetButtons(recipes)));

@@ -22,7 +22,7 @@ public class CheckFriendRecipe(
     {
         if (long.TryParse(update.CallbackQuery?.Data, out var id))
         {
-            var recipe = await recipeRepository.Get(id);
+            var recipe = await recipeRepository.GetByChatId(id);
 
             await botClient.SendTextMessageAsync(context.ChatId, $"Последний рецепт готовил: {recipe[0].nameRecipe}");
         }

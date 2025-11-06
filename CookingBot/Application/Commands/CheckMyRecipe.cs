@@ -17,7 +17,7 @@ public class CheckMyRecipe(IRecipeRepository recipeRepository, ITelegramBotClien
 
     public async Task Execute(Update update, ChatContext context)
     {
-        var recipes = await recipeRepository.Get(update.Message.Chat.Id);
+        var recipes = await recipeRepository.GetByChatId(update.Message.Chat.Id);
 
         await botClient.SendTextMessageAsync(update.Message.Chat.Id, GetRecipes(recipes));
     }

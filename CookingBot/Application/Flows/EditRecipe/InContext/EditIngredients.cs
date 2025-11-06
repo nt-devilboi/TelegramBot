@@ -18,7 +18,7 @@ public class EditIngredients(IRecipeRepository recipeRepository, ITelegramBotCli
         var (opcode, data) = Parse(update.Message.Text);
 
         if (!context.TryGetPayload(out var payload)) return;
-        var recipe = (await recipeRepository.Get(payload.NameRecipe))!;
+        var recipe = (await recipeRepository.GetByChatId(payload.NameRecipe))!;
 
 
         if (string.Compare(opcode, Commands.delete, StringComparison.OrdinalIgnoreCase) == 0)
@@ -70,7 +70,7 @@ public class EditIngredients(IRecipeRepository recipeRepository, ITelegramBotCli
     protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
     {
         if (!context.TryGetPayload(out var payload)) return;
-        var recipe = await recipeRepository.Get(payload.NameRecipe);
+        var recipe = await recipeRepository.GetByChatId(payload.NameRecipe);
         await botClient.SendTextMessageAsync(context.ChatId, "Хорошо давай изменим ингредиенты \n сейчас они такие:");
         await botClient.SendTextMessageAsync(context.ChatId, recipe!.GetIngredientsList());
         await botClient.SendTextMessageAsync(context.ChatId, "что хочешь, чтоб я добавил или удалил");
