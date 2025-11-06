@@ -65,7 +65,7 @@ builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
-builder.Services.AddContext<AddingRecipeContext>("добавить рецепт", x => x
+builder.Services.AddContext<AddingRecipeContext>("Добавить рецепт", x => x
     .AddHandler<AddingName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()

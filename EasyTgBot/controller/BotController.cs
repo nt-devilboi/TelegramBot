@@ -23,7 +23,7 @@ public class BotController(
         catch (Exception e)
         {
             Console.WriteLine(e);
-            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Я сломался из за команды");
+            await telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"Я сломался из за команды {e}");
         }
 
         return new OkResult();
