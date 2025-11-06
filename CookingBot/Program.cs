@@ -55,7 +55,7 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
 
 builder.Services.AddBaseTelegramCommands();
 builder.Services.AddTelegramBotWithController<MainMenuHandler>(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://e026e6e3b567a1.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://8a3a1cec757f53.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();

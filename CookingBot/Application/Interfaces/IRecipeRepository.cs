@@ -5,7 +5,9 @@ namespace CookingBot.Application.Interfaces;
 public interface IRecipeRepository
 {
     Task Upsert(Recipe recipe);
-    Task<List<Recipe>> Get(long chatId);
+    Task<List<Recipe>> GetByChatId(long chatId);
 
-    Task<Recipe?> Get(string name);
+    Task<Recipe?> GetByChatId(string name);
+
+    Task<Recipe?> GetById(long id);
 }

@@ -16,7 +16,7 @@ public class MainMenuHandler(
 {
     public async Task Handle(ChatContext context)
     {
-        var recipe = await repository.Get(context.ChatId);
+        var recipe = await repository.GetByChatId(context.ChatId);
         if (recipe.Count != 0)
         {
             await botClient.SendTextMessageAsync(context.ChatId, "Можешь выполнять эти команды",

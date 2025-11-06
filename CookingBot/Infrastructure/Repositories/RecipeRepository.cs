@@ -26,13 +26,18 @@ public class RecipeRepository(ChatTelegramDb chatTelegramDb) : IRecipeRepository
         await chatTelegramDb.SaveChangesAsync();
     }
 
-    public async Task<List<Recipe>> Get(long chatId)
+    public async Task<List<Recipe>> GetByChatId(long chatId)
     {
         return await chatTelegramDb.Recipes.Where(x => x.ChatId == chatId).ToListAsync();
     }
 
-    public async Task<Recipe?> Get(string name)
+    public async Task<Recipe?> GetByChatId(string name)
     {
         return await chatTelegramDb.Recipes.FirstOrDefaultAsync(x => EF.Functions.ILike(x.nameRecipe, name));
+    }
+
+    public async Task<Recipe?> GetById(long id)
+    {
+        return await chatTelegramDb.Recipes.FindAsync(id);
     }
 }

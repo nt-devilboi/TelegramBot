@@ -26,7 +26,7 @@ public class Cooking(
 
         if (Cooked == request.Value && context.TryGetPayload(out var payload))
         {
-            var recipe = (await recipeRepository.Get(payload.NameRecipe))!;
+            var recipe = (await recipeRepository.GetByChatId(payload.NameRecipe))!;
 
             recipe.WasCookedLastTime = DateTime.Now.ToUniversalTime();
 
@@ -43,7 +43,7 @@ public class Cooking(
     {
         if (!context.TryGetPayload(out var payload)) return;
 
-        var recipe = await recipeRepository.Get(payload.NameRecipe);
+        var recipe = await recipeRepository.GetByChatId(payload.NameRecipe);
         await botClient.SendTextMessageAsync(context.ChatId, $"Вот что нужно для блюда:");
         await botClient.SendTextMessageAsync(context.ChatId, recipe.GetIngredientsList());
         await botClient.SendTextMessageAsync(context.ChatId, $"Инструкция:\n {recipe.Instruction}");
