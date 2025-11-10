@@ -47,6 +47,7 @@ jobs:
         host: ${{secrets.HOST_IP}}
         username: ${{secrets.HOST_USER}}
         key: ${{secrets.SSH_KEY}}
+        use_insecure_cipher: true
         script: |
           cd /docker/
           docker compose down
