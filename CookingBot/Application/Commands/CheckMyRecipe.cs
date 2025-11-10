@@ -1,7 +1,7 @@
+using BotOrchestriX.Abstract;
+using BotOrchestriX.Entity;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
-using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -9,8 +9,8 @@ namespace CookingBot.Application.Commands;
 
 public class CheckMyRecipe(IRecipeRepository recipeRepository, ITelegramBotClient botClient) : IHandler
 {
-    public string Trigger { get; } = staticTrigger;
     public static string staticTrigger = "Покажи рецепт";
+    public string Trigger { get; } = staticTrigger;
     public string Desc { get; }
 
     public Priority Priority { get; } = Priority.Command;

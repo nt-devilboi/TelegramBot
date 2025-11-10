@@ -1,32 +1,35 @@
-using System.Collections;
 using System.Globalization;
-using System.Text.RegularExpressions;
+using BotOrchestriX.Abstract;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
-using EasyTgBot;
-using EasyTgBot.Abstract;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
 
-public partial class ChoosingDish(
+public class ChoosingDish(
     IRecipeRepository recipeRepository,
     ITelegramBotClient botClient)
     : ContextHandler<CookPayload, CookContext>
 {
     private const string Next = "Дальше";
+    private const string Back = "Назад";
+    private const string Select = "Выбрать";
     private const int Take = 3;
 
 
-    private static string WhatDoYouWantToCook = "Что хочешь приготовить?";
+    private static readonly string WhatDoYouWantToCook = "Что хочешь приготовить?";
 
     protected override async Task Handle(Update update, DetailContext<CookPayload, CookContext> context)
     {
         var request = update.CallbackQuery?.Data;
-        if (request == null || !context.TryGetPayload(out var payload)) return;
+        if (request == null || !context.TryGetPayload(out var payload))
+        {
+            await botClient.SendTextMessageAsync(context.ChatId, "Что-то пошло не так Напиши `Выйти`");
+            return;
+        }
 
         if ((request.StartsWith(Next) || request.StartsWith(Back)) &&
             int.TryParse(request.Split("_")[1], out var offset))
@@ -34,14 +37,14 @@ public partial class ChoosingDish(
             var recipes = await recipeRepository.GetByChatId(context.ChatId);
 
             await botClient.EditMessageReplyMarkupAsync(context.ChatId, payload.MessageId,
-                replyMarkup: new InlineKeyboardMarkup(
+                new InlineKeyboardMarkup(
                     GetButtons(recipes, offset)));
 
             return;
         }
 
 
-        var recipe = await recipeRepository.GetById(long.Parse(request));
+        var recipe = await recipeRepository.GetById(Guid.Parse(request.Split('_')[1]));
         if (recipe == null)
         {
             await botClient.SendTextMessageAsync(context.ChatId, $"Рецепт не нашел {request}");
@@ -77,18 +80,16 @@ public partial class ChoosingDish(
             yield return
             [
                 InlineKeyboardButton.WithCallbackData($"{ToUpperFirst(recipe.nameRecipe)}. \n {stringData}",
-                    $"select_{recipe.Id}")
+                    $"{Select}_{recipe.Id}")
             ];
         }
 
         yield return
         [
             InlineKeyboardButton.WithCallbackData(Back, $"{Back}_{offset - take}"),
-            InlineKeyboardButton.WithCallbackData(Next, $"{Next}_{offset + take}"),
+            InlineKeyboardButton.WithCallbackData(Next, $"{Next}_{offset + take}")
         ];
     }
-
-    private const string Back = "Назад";
 
     private string ToUpperFirst(string str)
     {

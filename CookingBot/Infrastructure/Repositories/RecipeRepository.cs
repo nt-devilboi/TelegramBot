@@ -3,7 +3,6 @@ using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
 using CookingBot.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
-using VkNet.Utils;
 
 namespace CookingBot.Infrastructure.Repositories;
 
@@ -36,7 +35,7 @@ public class RecipeRepository(ChatTelegramDb chatTelegramDb) : IRecipeRepository
         return await chatTelegramDb.Recipes.FirstOrDefaultAsync(x => EF.Functions.ILike(x.nameRecipe, name));
     }
 
-    public async Task<Recipe?> GetById(long id)
+    public async Task<Recipe?> GetById(Guid id)
     {
         return await chatTelegramDb.Recipes.FindAsync(id);
     }

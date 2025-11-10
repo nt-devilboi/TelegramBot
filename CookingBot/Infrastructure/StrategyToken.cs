@@ -1,10 +1,8 @@
-using CookingBot.Application.Commands;
-using CookingBot.Application.Flows;
+using BotOrchestriX.Abstract;
+using BotOrchestriX.Entity;
 using CookingBot.Application.Flows.AddRecipe;
 using CookingBot.Domain.Entity;
 using EasyOAuth.Abstraction;
-using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using Vostok.Logging.Abstractions;
@@ -14,7 +12,6 @@ namespace CookingBot.Infrastructure;
 public class StrategyToken(
     ILog log,
     ITelegramBotClient bot,
-    IChatRepository chatRepository,
     IContextRepository contextRepository)
     : EasyOAuth.Abstraction.StrategyToken
 {
@@ -23,16 +20,8 @@ public class StrategyToken(
         var telegramOAuth = data as TelegramOAuth; // по идей можно это исправить и сделать без этого
         var chatContext = ChatContext.CreateInAccountContext(telegramOAuth.chatId);
         var firstName = (await bot.GetChatAsync(telegramOAuth.chatId)).FirstName;
-        
-        var chat = new Chat
-        {
-            Token = token,
-            Id = telegramOAuth.chatId,
-            Name = firstName
-        };
 
-        
-        await chatRepository.Add(chat);
+
         await contextRepository.Upsert(chatContext);
 
         log.Info($"Token was linked with {telegramOAuth.chatId}");

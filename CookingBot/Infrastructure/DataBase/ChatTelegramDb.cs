@@ -1,7 +1,7 @@
+using BotOrchestriX.Infrastructure;
 using CookingBot.Application.Flows.Friends.InContext;
 using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
-using EasyTgBot.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -10,10 +10,10 @@ namespace CookingBot.Infrastructure.DataBase;
 
 public class ChatTelegramDb(IOptions<PostgresEntryPointOptions> options) : ChatDb
 {
+    private readonly string ConnectionString = options.Value.ConnString;
     public DbSet<TelegramOAuth> LinkOAuths { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
-    public DbSet<Friend> Friends { get; set; }
-    private readonly string ConnectionString = options.Value.ConnString;
+    // public DbSet<Friend> Friends { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -28,7 +28,7 @@ public class ChatTelegramDb(IOptions<PostgresEntryPointOptions> options) : ChatD
             .Property(x => x.Ingredients)
             .HasColumnType("jsonb")
             .HasConversion<string>();*/
-        
+
         modelBuilder.Entity<Recipe>()
             .Property(x => x.Ingredients)
             .HasColumnType("jsonb")

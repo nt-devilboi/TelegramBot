@@ -1,6 +1,6 @@
+using BotOrchestriX;
+using BotOrchestriX.Abstract;
 using CookingBot.Domain.Payloads;
-using EasyTgBot;
-using EasyTgBot.Abstract;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -12,10 +12,10 @@ public class AddingInstruction(ITelegramBotClient botClient)
     protected override async Task Handle(Update update,
         DetailContext<RecipePayload, AddingRecipeContext> context)
     {
-        var request = update.AsRequestWithText();
+        var request = update.Message.Text;
         if (context.TryGetPayload(out var payload))
         {
-            payload = payload with { Instruction = request.Value };
+            payload = payload with { Instruction = request };
             context.UpdatePayload(payload).State.Continue();
         }
     }

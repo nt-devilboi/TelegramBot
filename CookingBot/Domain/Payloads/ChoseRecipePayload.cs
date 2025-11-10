@@ -1,5 +1,5 @@
-using EasyTgBot.Abstract;
+using BotOrchestriX.Abstract;
 
-namespace CookingBot.Application.Flows.EditRecipe;
+namespace CookingBot.Domain.Payloads;
 
 public record ChoseRecipePayload(string NameRecipe) : BasePayload;

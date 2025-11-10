@@ -1,10 +1,11 @@
-using EasyTgBot.Abstract;
+using BotOrchestriX.Abstract;
+using CookingBot.Infrastructure;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Flows.Friends.InContext;
 
-public class AddFriend(ITelegramBotClient botClient, IChatRepository chatRepository, IFriendRepository friendRepository)
+/*public class AddFriend(ITelegramBotClient botClient, IChatRepository<ChatWithAuth> chatRepository, IFriendRepository friendRepository)
     : ContextHandler<BasePayload, FriendsContext>
 {
     protected override async Task Handle(Update update, DetailContext<BasePayload, FriendsContext> context)
@@ -16,9 +17,9 @@ public class AddFriend(ITelegramBotClient botClient, IChatRepository chatReposit
                 await botClient.SendTextMessageAsync(context.ChatId, "Такого пользователя нету");
                 return;
             }
-            
-            await friendRepository.Add(new Friend() {UserId = context.ChatId, FriendId = friendId} );
-            
+
+            await friendRepository.Add(new Friend { UserId = context.ChatId, FriendId = friendId });
+
             await botClient.SendTextMessageAsync(context.ChatId, "Добавил друга");
         }
         else
@@ -32,4 +33,4 @@ public class AddFriend(ITelegramBotClient botClient, IChatRepository chatReposit
         await botClient.SendTextMessageAsync(context.ChatId, "Введи id пользователя");
         await botClient.SendTextMessageAsync(context.ChatId, $"Либо дай свой: {context.ChatId}");
     }
-}
+}*/

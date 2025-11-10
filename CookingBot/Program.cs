@@ -1,14 +1,9 @@
-using EasyOAuth;
-using EasyOAuth.Builder;
-using EasyOAuth.Extensions;
-using EasyTgBot;
-using EasyTgBot.Abstract;
+using BotOrchestriX;
+using BotOrchestriX.Abstract;
 using CookingBot;
-using CookingBot.Application.Flows;
 using CookingBot.Application.Flows.AddRecipe.InContexts;
 using CookingBot.Application.Flows.AddRecipe.InContexts.ContextHandlers;
 using CookingBot.Application.Flows.EditRecipe.InContext;
-using CookingBot.Application.Flows.Friends;
 using CookingBot.Application.Flows.Friends.InContext;
 using CookingBot.Application.Flows.WantToCook.InContexts;
 using CookingBot.Application.Flows.WantToCook.InContexts.ContextHandlers;
@@ -17,6 +12,9 @@ using CookingBot.Domain.Entity;
 using CookingBot.Infrastructure;
 using CookingBot.Infrastructure.DataBase;
 using CookingBot.Infrastructure.Repositories;
+using EasyOAuth;
+using EasyOAuth.Builder;
+using EasyOAuth.Extensions;
 using Microsoft.EntityFrameworkCore;
 using EditContext = CookingBot.Application.Flows.EditRecipe.EditContext;
 
@@ -53,25 +51,26 @@ builder.Services.AddOptions<PostgresEntryPointOptions>()
     .Configure(x => x.ConnString = Environment.GetEnvironmentVariable("CONN_STRING"))
     .ValidateDataAnnotations();
 
-builder.Services.AddBaseTelegramCommands();
+
 builder.Services.AddTelegramBotWithController<MainMenuHandler>(
-    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://8a3a1cec757f53.lhr.life",
+    Environment.GetEnvironmentVariable("HOST_FOR_TG") ?? "https://fc1063bcbc949a.lhr.life",
     Environment.GetEnvironmentVariable("TG_TOKEN") ??
     throw new ArgumentException("NOT HAVE TOKEN FOR BOT TG"));
+builder.Services.AddBaseTelegramCommands();
 builder.Services.AddTelegramDbContext<ChatTelegramDb>();
 
 
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
-builder.Services.AddScoped<IFriendRepository, FriendRepository>();
+// builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 
 var registerFlow = new ServiceRegistryFlow();
-builder.Services.AddContext<AddingRecipeContext>("Добавить рецепт", x => x
+builder.Services.AddFlow<AddingRecipeContext>("Добавить рецепт", x => x
     .AddHandler<AddingName>()
     .AddHandler<AddingIngredients>()
     .AddHandler<AddingInstruction>()
     .AddHandler<SaveRecipe>(), registerFlow);
 
-builder.Services.AddContext<CookContext>("Хочу приготовить", x => x
+builder.Services.AddFlow<CookContext>("Хочу приготовить", x => x
     .AddHandler<ChoosingDish>()
     .AddHandler<Cooking>(), registerFlow);
 
@@ -81,7 +80,7 @@ builder.Services.AddContext<CookContext>("Хочу приготовить", x =>
         (x => x.AddHandler<CheckFriendRecipe>(), "Посмотреть рецепты"))
     , registerFlow);*/
 
-builder.Services.AddContext<EditContext>("Редактировать рецепт",
+builder.Services.AddFlow<EditContext>("Редактировать рецепт",
     x => x.AddHandler<ChooseEditRecipe>()
         .AddSwitch<SwitchEditItem>(
             (x => x.AddHandler<EditInstruction>(), "Инструкцию"),

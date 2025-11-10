@@ -1,17 +1,21 @@
+using BotOrchestriX.Abstract;
 using CookingBot.Application.Interfaces;
-using EasyTgBot.Abstract;
+using CookingBot.Domain.Payloads;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Flows.EditRecipe.InContext;
 
-public class EditInstruction(IRecipeRepository recipeRepository, ITelegramBotClient botClient) : ContextHandler<ChoseRecipePayload, EditContext>
+public class EditInstruction(IRecipeRepository recipeRepository, ITelegramBotClient botClient)
+    : ContextHandler<ChoseRecipePayload, EditContext>
 {
     protected override async Task Handle(Update update, DetailContext<ChoseRecipePayload, EditContext> context)
     {
         if (!context.TryGetPayload(out var payload)) return;
 
-        var oldPayload = (await recipeRepository.GetByChatId(payload.NameRecipe))!; //  я уверен, так как в прошлом контексте это проверялось.
+        var oldPayload =
+            (await recipeRepository.GetByChatId(payload
+                .NameRecipe))!; //  я уверен, так как в прошлом контексте это проверялось.
 
         oldPayload.Instruction = update.Message.Text;
 

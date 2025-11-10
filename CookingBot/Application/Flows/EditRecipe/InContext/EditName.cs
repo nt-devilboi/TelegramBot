@@ -1,11 +1,13 @@
+using BotOrchestriX.Abstract;
 using CookingBot.Application.Interfaces;
-using EasyTgBot.Abstract;
+using CookingBot.Domain.Payloads;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Flows.EditRecipe.InContext;
 
-public class EditName(IRecipeRepository recipeRepository, ITelegramBotClient botClient) : ContextHandler<ChoseRecipePayload, EditContext>
+public class EditName(IRecipeRepository recipeRepository, ITelegramBotClient botClient)
+    : ContextHandler<ChoseRecipePayload, EditContext>
 {
     protected override async Task Handle(Update update, DetailContext<ChoseRecipePayload, EditContext> context)
     {
@@ -16,14 +18,14 @@ public class EditName(IRecipeRepository recipeRepository, ITelegramBotClient bot
 
         await recipeRepository.Upsert(oldPayload);
 
-        await botClient.SendTextMessageAsync(context.ChatId, "Сохранил изменение");        
+        await botClient.SendTextMessageAsync(context.ChatId, "Сохранил изменение");
         context.Reset();
     }
 
     protected override async Task Enter(DetailContext<ChoseRecipePayload, EditContext> context)
     {
         if (!context.TryGetPayload(out var payload)) return;
-        
+
         var recipe = await recipeRepository.GetByChatId(payload.NameRecipe);
         await botClient.SendTextMessageAsync(context.ChatId, "Хорошо давай изменим название \n сейчас оно такое:");
         await botClient.SendTextMessageAsync(context.ChatId, recipe!.nameRecipe);

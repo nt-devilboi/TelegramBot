@@ -1,8 +1,7 @@
+using BotOrchestriX.Abstract;
 using CookingBot.Application.Flows.ExtentsionCook;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Payloads;
-using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
