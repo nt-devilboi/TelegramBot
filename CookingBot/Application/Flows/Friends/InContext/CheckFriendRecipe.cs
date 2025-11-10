@@ -1,16 +1,16 @@
+using BotOrchestriX.Abstract;
 using CookingBot.Application.Interfaces;
+using CookingBot.Infrastructure;
 using CookingBot.Infrastructure.DataBase;
-using EasyTgBot.Abstract;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using Vostok.Logging.Abstractions;
-using Chat = EasyTgBot.Entity.Chat;
 
 namespace CookingBot.Application.Flows.Friends.InContext;
 
-public class CheckFriendRecipe(
+/*public class CheckFriendRecipe(
     IFriendRepository friendRepository,
     ITelegramBotClient botClient,
     IRecipeRepository recipeRepository,
@@ -31,11 +31,11 @@ public class CheckFriendRecipe(
     protected override async Task Enter(DetailContext<BasePayload, FriendsContext> context)
     {
         var friendslist = await friendRepository.GetFriends(context.ChatId);
-        var friendData = new Chat[friendslist.Count];
+        var friendData = new ChatWithAuth[friendslist.Count];
         log.Debug($"Friends {context.ChatId}:\n");
         for (var index = 0; index < friendslist.Count; index++)
         {
-            friendData[index] = await chatRepository.Get(friendslist[index].FriendId);
+  //Todo: сейчас это не работает          friendData[index] = await chatRepository.Get(friendslist[index].FriendId);
             log.Debug($"{friendslist[index].FriendId}");
         }
 
@@ -43,7 +43,7 @@ public class CheckFriendRecipe(
             replyMarkup: ButtonFriends(friendData));
     }
 
-    private InlineKeyboardMarkup ButtonFriends(Chat[] friends)
+    private InlineKeyboardMarkup ButtonFriends(ChatWithAuth[] friends)
     {
         // формируем кнопки из списка друзей
 
@@ -80,4 +80,4 @@ public class Friend
 {
     public long UserId { get; init; }
     public long FriendId { get; init; }
-}
+}*/

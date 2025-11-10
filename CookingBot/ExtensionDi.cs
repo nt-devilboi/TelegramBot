@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Vostok.Logging.Abstractions;
 using Vostok.Logging.Console;
 using Vostok.Logging.File;
@@ -17,16 +16,16 @@ internal static class ExtensionDi
         {
             log = new ConsoleLog(new ConsoleLogSettings
             {
-                ColorsEnabled = true,
+                ColorsEnabled = true
             });
         }
 
         else
         {
             if (Directory.Exists("./logs")) Directory.CreateDirectory("./logs");
-            log = new FileLog(new FileLogSettings()
+            log = new FileLog(new FileLogSettings
             {
-                FilePath = $"./logs/log{DateTime.Now:yyyy-M-d}.log",
+                FilePath = $"./logs/log{DateTime.Now:yyyy-M-d}.log"
             });
         }
 

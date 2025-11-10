@@ -1,7 +1,7 @@
+using BotOrchestriX;
+using BotOrchestriX.Abstract;
+using BotOrchestriX.Entity;
 using EasyOAuth.Abstraction;
-using EasyTgBot;
-using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using Vostok.Logging.Abstractions;
@@ -14,28 +14,25 @@ namespace CookingBot.Application.Commands;
 public class OAuthGoogle(IOAuthClient authClient, ILog log, ITelegramBotClient botClient)
     : Command
 {
-    private readonly string _text = "Google";
     public static readonly string StaticTrigger = "Авторизоваться";
+    private readonly string _text = "Google";
 
     public override string Trigger { get; } = StaticTrigger;
     public string Desc => "Если ты еще не вошел нужно войти, чтоб я понимал кто ты";
 
     public Priority Priority { get; } = Priority.Command;
 
-    public override async Task Execute(Update update, ChatContext context = null)
+
+    public override async Task Execute(Update update, ChatContext context)
     {
         var chatId = update.Message.Chat.Id;
 
-        if (context.InUserAccount())
+        if (context.IsMenu())
         {
             await botClient.SendTextMessageAsync(chatId, "Ты уже авторизован");
             return;
         }
 
-        if (context.InFlow())
-        {
-            await botClient.SendTextMessageAsync(chatId, "Ты сейчас уже что-то делаешь");
-        }
 
         log.Info($"при созданий запроса chat id {chatId}");
         var bottons =
@@ -46,7 +43,4 @@ public class OAuthGoogle(IOAuthClient authClient, ILog log, ITelegramBotClient b
         await botClient.SendTextMessageAsync(chatId.ToString(), "выбери где авторизоваться", parseMode: ParseMode.Html,
             replyMarkup: bottons);
     }
-    
-    
-    
 }

@@ -1,4 +1,4 @@
-using EasyTgBot.Abstract;
+using BotOrchestriX.Abstract;
 
 namespace CookingBot.Domain.Payloads;
 

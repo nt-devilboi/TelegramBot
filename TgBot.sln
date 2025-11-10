@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookingBot", "CookingBot\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyOAuth2.0", "..\..\RiderProjects\EasyOAuth2.0\EasyOAuth2.0\EasyOAuth2.0.csproj", "{8E3B4031-01BA-4631-AC27-2423ADFF96E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyTgBot", "EasyTgBot\EasyTgBot.csproj", "{E7A84C47-14CD-4CB4-9FD3-CC7260139271}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookingBot.Tests", "CookingBot.Tests\CookingBot.Tests.csproj", "{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5ABC3E20-70C6-400A-9925-D16B91AC0BDB}"
@@ -15,7 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.dockerignore = .dockerignore
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyTgBot.Tests", "EasyTgBot.Tests\EasyTgBot.Tests.csproj", "{DD8390C9-34DE-43F0-B146-99BC20990C40}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BotOrchestriX", "BotOrchestriX", "{B9B8EB60-023A-483E-A8BB-7AF33F417C8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotOrchestriX", "..\BotOrchestriX\BotOrchestriX\BotOrchestriX.csproj", "{CFB82A2B-37D6-4454-9B9D-772565092007}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,17 +31,16 @@ Global
 		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E3B4031-01BA-4631-AC27-2423ADFF96E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E7A84C47-14CD-4CB4-9FD3-CC7260139271}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C73F7A1-4C46-43BD-B26E-9DF2FF37717C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD8390C9-34DE-43F0-B146-99BC20990C40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD8390C9-34DE-43F0-B146-99BC20990C40}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD8390C9-34DE-43F0-B146-99BC20990C40}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD8390C9-34DE-43F0-B146-99BC20990C40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFB82A2B-37D6-4454-9B9D-772565092007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFB82A2B-37D6-4454-9B9D-772565092007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFB82A2B-37D6-4454-9B9D-772565092007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFB82A2B-37D6-4454-9B9D-772565092007}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CFB82A2B-37D6-4454-9B9D-772565092007} = {B9B8EB60-023A-483E-A8BB-7AF33F417C8E}
 	EndGlobalSection
 EndGlobal

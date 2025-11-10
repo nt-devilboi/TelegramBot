@@ -1,8 +1,8 @@
 using System.Globalization;
+using BotOrchestriX.Abstract;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
-using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
+using CookingBot.Domain.Payloads;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -12,7 +12,6 @@ namespace CookingBot.Application.Flows.EditRecipe.InContext;
 public class ChooseEditRecipe(ITelegramBotClient botClient, IRecipeRepository recipeRepository)
     : ContextHandler<ChoseRecipePayload, EditContext>
 {
-    
     protected override async Task Handle(Update update, DetailContext<ChoseRecipePayload, EditContext> context)
     {
         var nameRecipe = update.Message.Text;
@@ -40,7 +39,7 @@ public class ChooseEditRecipe(ITelegramBotClient botClient, IRecipeRepository re
         await botClient.SendTextMessageAsync(context.ChatId, "Какой рецепт хочешь отредактировать",
             replyMarkup: new ReplyKeyboardMarkup(GetButtons(recipes)));
     }
-    
+
     private IEnumerable<KeyboardButton> GetButtons(IReadOnlyList<Recipe> recipes)
     {
         return recipes.Select(recipe => new KeyboardButton($"{ToUpperFirst(recipe.nameRecipe)}"));

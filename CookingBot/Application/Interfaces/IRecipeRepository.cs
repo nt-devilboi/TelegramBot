@@ -9,5 +9,5 @@ public interface IRecipeRepository
 
     Task<Recipe?> GetByChatId(string name);
 
-    Task<Recipe?> GetById(long id);
+    Task<Recipe?> GetById(Guid id);
 }

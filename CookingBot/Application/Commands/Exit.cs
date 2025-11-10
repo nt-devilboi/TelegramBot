@@ -1,12 +1,12 @@
-using EasyTgBot;
-using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
+using BotOrchestriX;
+using BotOrchestriX.Abstract;
+using BotOrchestriX.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace CookingBot.Application.Commands;
 
-public class Exit(IContextRepository contextRepository, ITelegramBotClient botClient) : Command
+public class Exit(ITelegramBotClient botClient) : Command
 {
     public override string Trigger { get; } = "Выйти";
     public string Desc { get; }
@@ -14,15 +14,14 @@ public class Exit(IContextRepository contextRepository, ITelegramBotClient botCl
 
     public override async Task Execute(Update update, ChatContext context = null)
     {
-        if (context.InUserAccount())
+        if (context.IsMenu())
         {
             await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Ты уже в главном меню");
             return;
         }
 
         context.Payload = null;
-        context.ToUserAccount();
-        await contextRepository.Upsert(context);
+        context.ToMenu();
         await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Теперь ты в главном меню");
     }
 }

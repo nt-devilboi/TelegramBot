@@ -9,12 +9,10 @@ public class Recipe
 
     public string nameRecipe { get; set; }
 
-    [Column(TypeName = "jsonb")]
-    
-    public Dictionary<string, IngredientDetail> Ingredients { get; set; }
+    [Column(TypeName = "jsonb")] public Dictionary<string, IngredientDetail> Ingredients { get; set; }
 
     public string Instruction { get; set; }
-    
+
     public DateTime? WasCookedLastTime { get; set; }
 
     public long ChatId { get; set; }

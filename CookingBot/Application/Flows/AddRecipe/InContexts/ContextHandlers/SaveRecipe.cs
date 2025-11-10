@@ -1,10 +1,8 @@
-using CookingBot.Application.Commands;
+using BotOrchestriX;
+using BotOrchestriX.Abstract;
 using CookingBot.Application.Interfaces;
 using CookingBot.Domain.Entity;
 using CookingBot.Domain.Payloads;
-using EasyTgBot;
-using EasyTgBot.Abstract;
-using EasyTgBot.Entity;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -19,10 +17,10 @@ public class SaveRecipe(
     protected override async Task Handle(Update update,
         DetailContext<RecipePayload, AddingRecipeContext> context)
     {
-        var request = update.AsRequestWithText();
-        if (request.Value != "Сохранить")
+        var request = update.Message.Text;
+        if (request != "Сохранить")
         {
-            await botClient.SendTextMessageAsync(request.GetChatId(), "Я тебя не понимаю");
+            await botClient.SendTextMessageAsync(context.ChatId, "Я тебя не понимаю");
             return;
         }
 
@@ -36,13 +34,13 @@ public class SaveRecipe(
                     Ingredients = payload.Ingredients,
                     Instruction = payload.Instruction,
                     Id = Guid.NewGuid(),
-                    ChatId = request.GetChatId()
+                    ChatId = context.ChatId
                 };
 
         await recipeRepository.Upsert(recipe);
 
 
-        await botClient.SendTextMessageAsync(request.GetChatId(), "Сохранил!");
+        await botClient.SendTextMessageAsync(context.ChatId, "Сохранил!");
         context.Reset();
     }
 
