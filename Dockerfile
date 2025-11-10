@@ -7,10 +7,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 RUN mkdir -p CookingBot
 COPY ./CookingBot ./CookingBot
-RUN mkdir -p EasyTgBot
-COPY ./EasyTgBot ./EasyTgBot
-RUN dotnet restore "./EasyTgBot/EasyTgBot.csproj" --verbosity detailed
 RUN dotnet restore "./CookingBot/CookingBot.csproj"
+
 WORKDIR /src/CookingBot
 RUN dotnet build "CookingBot.csproj" -c Release -o /app/build
 
