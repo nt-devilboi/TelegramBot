@@ -17,7 +17,7 @@ public class ChatTelegramDb(IOptions<PostgresEntryPointOptions> options) : ChatD
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
+    { 
         optionsBuilder.UseNpgsql(ConnectionString);
         // optionsBuilder.UseInMemoryDatabase("FakeDbContext");
     }
