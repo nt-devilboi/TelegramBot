@@ -6,9 +6,12 @@ EXPOSE 443
 
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
 ARG CONN_STRING 
 
+RUN dotnet tool install --global dotnet-ef --version 8.0.22
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+RUN dotnet ef --version 
 WORKDIR /src
 RUN mkdir -p CookingBot
 COPY ./CookingBot ./CookingBot
