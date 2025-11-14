@@ -55,9 +55,9 @@ jobs:
     - name: try make migration
       uses: appleboy/ssh-action@v1.0.0
       with: 
-        host: $${{secrets.HOST_IP}}
-        username: $${{secrets.HOST_USER}}
-        key: $${{secrets.SSH_KEY}}
+        host: ${{secrets.HOST_IP}}
+        username: ${{secrets.HOST_USER}}
+        key: ${{secrets.SSH_KEY}}
         script: |
           cd /docker/
           dotnet ef database update -connection "${{secrets.CONN_STRING}}"
