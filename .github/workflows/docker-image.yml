@@ -10,13 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-    
-    - name: check files before checkout 
-      run: pwd
-
-    
-    
     - uses: actions/checkout@v4
+
+    - name: download .net8
+    - uses: actions/setup-dotnet@v3
+      with: 
+        dotnet-version: '8.0.x'
+
+    - name: update database
+      run: dotnet tool install --global dotnet-ef && cd ./CookingBot && dotnet ef database update -connectoin "${CONN_STRING}"
     
     - name: Build the Docker image
       run: ls && docker build . --file Dockerfile --tag my-image-name:$(date +%s)
@@ -41,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps: 
+    - name: make migratoins
+      run: dotnet ef database update --connection "${secrets.CONN_STRING}" 
     - name: deploy to the server
       uses: appleboy/ssh-action@v1.0.0
       with: 
@@ -52,15 +56,6 @@ jobs:
           docker compose down
           docker compose pull
           docker compose up -d
-    - name: try make migration
-      uses: appleboy/ssh-action@v1.0.0
-      with: 
-        host: ${{secrets.HOST_IP}}
-        username: ${{secrets.HOST_USER}}
-        key: ${{secrets.SSH_KEY}}
-        script: |
-          cd /docker/
-          dotnet ef database update -connection "${{secrets.CONN_STRING}}"
       
         
     
