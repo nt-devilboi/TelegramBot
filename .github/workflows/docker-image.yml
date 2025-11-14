@@ -10,15 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: download .net8
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v5
       with: 
-        dotnet-version: '8.0.22'
+        dotnet-version: '8.0.x'
 
     - name: update database
-      run: dotnet tool install --global dotnet-ef && cd ./CookingBot && dotnet ef database update -connectoin "${CONN_STRING}"
+      run: dotnet tool install --global dotnet-ef --version 9.0.3 && cd ./CookingBot && dotnet ef database update -connectoin "${CONN_STRING}"
     
     - name: Build the Docker image
       run: ls && docker build . --file Dockerfile --tag my-image-name:$(date +%s)
