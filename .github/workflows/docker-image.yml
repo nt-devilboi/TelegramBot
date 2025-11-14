@@ -18,7 +18,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: update database
-      run: dotnet tool install --global dotnet-ef --version 9.0.3 && cd ./CookingBot && dotnet ef database update -connectoin "${CONN_STRING}"
+      run: dotnet tool install --global dotnet-ef --version 9.0.3 && cd ./CookingBot && dotnet ef database update --connection "${CONN_STRING}"
     
     - name: Build the Docker image
       run: ls && docker build . --file Dockerfile --tag my-image-name:$(date +%s)
