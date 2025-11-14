@@ -18,7 +18,7 @@ jobs:
 
     - name: update database
       env: 
-        CONN_STRING: ${{CONN_STRING}}
+        CONN_STRING: ${{secrets.CONN_STRING}}
       run: dotnet tool install --global dotnet-ef --version 9.0.3 && cd ./CookingBot && dotnet ef database update
     
     - name: Build the Docker image
