@@ -43,8 +43,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps: 
-    - name: make migratoins
-      run: dotnet ef database update --connection "${secrets.CONN_STRING}" 
     - name: deploy to the server
       uses: appleboy/ssh-action@v1.0.0
       with: 
