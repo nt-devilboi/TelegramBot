@@ -15,7 +15,7 @@ jobs:
     - name: download .net8
       uses: actions/setup-dotnet@v3
       with: 
-        dotnet-version: '9.0.10'
+        dotnet-version: '9.0.3'
 
     - name: update database
       run: dotnet tool install --global dotnet-ef && cd ./CookingBot && dotnet ef database update -connectoin "${CONN_STRING}"
