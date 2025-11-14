@@ -6,7 +6,6 @@ on:
 
 jobs:
   build-and-push-docker-hub:
-
     runs-on: ubuntu-latest
     environment: production
     steps:
