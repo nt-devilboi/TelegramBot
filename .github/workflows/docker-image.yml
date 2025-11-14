@@ -60,7 +60,7 @@ jobs:
         key: $${{secrets.SSH_KEY}}
         script: |
           cd /docker/
-          dotnet ef database update -connection "$${{secrets.CONN_STRING}}"
+          dotnet ef database update -connection "${{secrets.CONN_STRING}}"
       
         
     
